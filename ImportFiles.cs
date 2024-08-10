@@ -43,11 +43,7 @@ namespace Bosch_ImportData
         }
         private void btnSearchZip_Click(object sender, EventArgs e)
         {
-            //LV_ATMO.Items.Clear();
-            //LV_CC.Items.Clear();
-            //LV_DESCONHECIDO.Items.Clear();
-            //LV_ATMO.Items.Clear();
-
+        
             ListaLV.Items.Clear();
 
 
