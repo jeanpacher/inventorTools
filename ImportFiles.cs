@@ -96,19 +96,7 @@ namespace Bosch_ImportData
             TreeViewBosch tb = new TreeViewBosch();
             tb.TreeCreate(TreeBosch, codNorma);
 
-
-
-            //GroupByFolder();
-
-
-            // Listar objetos
-            //ListarObjetos(codNorma, destinationDirectory);
-
-
-            // Procurar o arquivo principal de montagem do Inventor
-            // string[] files = FindMainInventorAssembly(destinationDirectory, fileNameWithoutExtension);
-
-            // Verifica se existe algum erro de link
+            MessageBox.Show("Done");
 
         }
         
