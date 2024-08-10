@@ -1,0 +1,33 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Bosch_ImportData.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="tempVaultRootPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Temp1\VaultWorkFolderBosch\</Value>
+    </Setting>
+    <Setting Name="VaultRootPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\VaultWorkFolderBosch\</Value>
+    </Setting>
+    <Setting Name="ProjectRootPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Sites\CtP_TEF\project\</Value>
+    </Setting>
+    <Setting Name="AtmoRootPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ATMOLIB\</Value>
+    </Setting>
+    <Setting Name="ContentCenterRootPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ContentCenter\</Value>
+    </Setting>
+    <Setting Name="Catalog" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ATMOLIB\Library\Catalog\</Value>
+    </Setting>
+    <Setting Name="ProdutosBosch" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ATMOLIB\Produtos Bosch\</Value>
+    </Setting>
+    <Setting Name="EnglishCC" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ContentCenter\en-US\</Value>
+    </Setting>
+    <Setting Name="PortugueseCC" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ContentCenter\pt-BR\</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
