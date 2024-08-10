@@ -96,7 +96,7 @@ namespace Bosch_ImportData
             TreeViewBosch tb = new TreeViewBosch();
             tb.TreeCreate(TreeBosch, codNorma);
 
-            MessageBox.Show("Done");
+            MessageBox.Show("D");
 
         }
         
