@@ -7,22 +7,16 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
-
 namespace Bosch_ImportData.Properties {
-    
-    
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
-        
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-        
         public static Settings Default {
             get {
                 return defaultInstance;
             }
         }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("C:\\Temp1\\VaultWorkFolderBosch\\")]
@@ -34,7 +28,6 @@ namespace Bosch_ImportData.Properties {
                 this["tempVaultRootPath"] = value;
             }
         }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("C:\\VaultWorkFolderBosch\\")]
@@ -46,7 +39,6 @@ namespace Bosch_ImportData.Properties {
                 this["VaultRootPath"] = value;
             }
         }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Sites\\CtP_TEF\\project\\")]
@@ -58,7 +50,6 @@ namespace Bosch_ImportData.Properties {
                 this["ProjectRootPath"] = value;
             }
         }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ATMOLIB\\")]
@@ -70,7 +61,6 @@ namespace Bosch_ImportData.Properties {
                 this["AtmoRootPath"] = value;
             }
         }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ContentCenter\\")]
@@ -82,7 +72,6 @@ namespace Bosch_ImportData.Properties {
                 this["ContentCenterRootPath"] = value;
             }
         }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ATMOLIB\\Library\\Catalog\\")]
@@ -94,7 +83,6 @@ namespace Bosch_ImportData.Properties {
                 this["Catalog"] = value;
             }
         }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ATMOLIB\\Produtos Bosch\\")]
@@ -106,7 +94,6 @@ namespace Bosch_ImportData.Properties {
                 this["ProdutosBosch"] = value;
             }
         }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ContentCenter\\en-US\\")]
@@ -118,7 +105,6 @@ namespace Bosch_ImportData.Properties {
                 this["EnglishCC"] = value;
             }
         }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ContentCenter\\pt-BR\\")]

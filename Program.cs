@@ -1,12 +1,10 @@
 ﻿using Bosch_ImportData;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
-namespace IntegracaoSelgron
+namespace BoschTools
 {
     internal static class Program
     {
@@ -18,12 +16,7 @@ namespace IntegracaoSelgron
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
             Application.Run(new ImportFiles());
-
-
-            //Application.Run(new AmbienteTeste());
-
         }
     }
 }

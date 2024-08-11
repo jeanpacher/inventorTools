@@ -6,7 +6,6 @@
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -19,9 +18,7 @@
             }
             base.Dispose(disposing);
         }
-
         #region Windows Form Designer generated code
-
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
@@ -29,7 +26,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("$");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("$");
             this.label1 = new System.Windows.Forms.Label();
             this.txtZipFileName = new System.Windows.Forms.TextBox();
             this.btnSearchZip = new System.Windows.Forms.Button();
@@ -48,12 +45,13 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabelaItens = new System.Windows.Forms.DataGridView();
-            this.ColunaTipo = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.ColunaName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColunaFind = new System.Windows.Forms.DataGridViewButtonColumn();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.ColunaTipo = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.ColunaName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColunaFind = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.originalNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.subMenu.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -167,11 +165,11 @@
             this.TreeBosch.ItemHeight = 24;
             this.TreeBosch.Location = new System.Drawing.Point(0, 0);
             this.TreeBosch.Name = "TreeBosch";
-            treeNode1.Name = "Node0";
-            treeNode1.Tag = "root";
-            treeNode1.Text = "$";
+            treeNode3.Name = "Node0";
+            treeNode3.Tag = "root";
+            treeNode3.Text = "$";
             this.TreeBosch.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1});
+            treeNode3});
             this.TreeBosch.Size = new System.Drawing.Size(391, 715);
             this.TreeBosch.TabIndex = 14;
             this.TreeBosch.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewNorma_AfterSelect);
@@ -236,7 +234,8 @@
             this.tabelaItens.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ColunaTipo,
             this.ColunaName,
-            this.ColunaFind});
+            this.ColunaFind,
+            this.originalNameColumn});
             this.tabelaItens.ContextMenuStrip = this.subMenu;
             this.tabelaItens.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabelaItens.Location = new System.Drawing.Point(3, 3);
@@ -246,33 +245,6 @@
             this.tabelaItens.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.tabelaItens_CellClick);
             this.tabelaItens.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.tabelaItens_CellValueChanged);
             // 
-            // ColunaTipo
-            // 
-            this.ColunaTipo.HeaderText = "TIPO";
-            this.ColunaTipo.Items.AddRange(new object[] {
-            "Norma",
-            "ATMOLIB_Library",
-            "ATMOLIB_ProdutosBosch",
-            "NormaAuxiliar",
-            "ContentCenter",
-            "Desconhecido"});
-            this.ColunaTipo.Name = "ColunaTipo";
-            this.ColunaTipo.ReadOnly = true;
-            this.ColunaTipo.Width = 200;
-            // 
-            // ColunaName
-            // 
-            this.ColunaName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.ColunaName.HeaderText = "NAME";
-            this.ColunaName.Name = "ColunaName";
-            // 
-            // ColunaFind
-            // 
-            this.ColunaFind.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ColunaFind.HeaderText = "PROCURAR";
-            this.ColunaFind.Name = "ColunaFind";
-            this.ColunaFind.Text = "Search";
-            // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.ListaLV);
@@ -281,7 +253,7 @@
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage2.Size = new System.Drawing.Size(797, 689);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tabPage2";
+            this.tabPage2.Text = "LISTA";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel1
@@ -323,6 +295,39 @@
             this.splitContainer1.SplitterDistance = 391;
             this.splitContainer1.TabIndex = 18;
             // 
+            // ColunaTipo
+            // 
+            this.ColunaTipo.HeaderText = "TIPO";
+            this.ColunaTipo.Items.AddRange(new object[] {
+            "Norma",
+            "ATMOLIB_Library",
+            "ATMOLIB_ProdutosBosch",
+            "NormaAuxiliar",
+            "ContentCenter",
+            "Desconhecido"});
+            this.ColunaTipo.Name = "ColunaTipo";
+            this.ColunaTipo.ReadOnly = true;
+            this.ColunaTipo.Width = 200;
+            // 
+            // ColunaName
+            // 
+            this.ColunaName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.ColunaName.HeaderText = "NAME";
+            this.ColunaName.Name = "ColunaName";
+            // 
+            // ColunaFind
+            // 
+            this.ColunaFind.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ColunaFind.HeaderText = "PROCURAR";
+            this.ColunaFind.Name = "ColunaFind";
+            this.ColunaFind.Text = "Search";
+            // 
+            // originalNameColumn
+            // 
+            this.originalNameColumn.HeaderText = "NomeOriginal";
+            this.originalNameColumn.Name = "originalNameColumn";
+            this.originalNameColumn.Visible = false;
+            // 
             // ImportFiles
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -348,11 +353,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
-
         #endregion
-
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtZipFileName;
         private System.Windows.Forms.Button btnSearchZip;
@@ -372,10 +374,11 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.DataGridView tabelaItens;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.DataGridViewComboBoxColumn ColunaTipo;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColunaName;
         private System.Windows.Forms.DataGridViewButtonColumn ColunaFind;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn originalNameColumn;
     }
 }
