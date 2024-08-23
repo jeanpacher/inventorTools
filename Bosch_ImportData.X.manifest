@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity name="Bosch_ImportData" version="1.0.0.0"></assemblyIdentity>
+  <clrClass clsid="{ca494c79-b928-476b-9f2b-39cffff5c45d}" progid="Bosch_ImportData.PluginServer" threadingModel="Both" name="Bosch_ImportData.PluginServer"></clrClass>
+  <file name="Bosch_ImportData.dll" hashalg="SHA1"></file>
+</assembly>

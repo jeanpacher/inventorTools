@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Addin Type="Plugin">
+  <ClassId>{ca494c79-b928-476b-9f2b-39cffff5c45d}</ClassId>
+  <ClientId>{ca494c79-b928-476b-9f2b-39cffff5c45d}</ClientId>
+  <DisplayName>BOSCH Import Data</DisplayName>
+  <Description>BOSCH Import Data</Description>
+  <Assembly>C:\KeepSoftwares\Bosch\Bosch_ImportData.dll</Assembly>
+</Addin>

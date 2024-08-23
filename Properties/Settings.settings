@@ -29,5 +29,20 @@
     <Setting Name="PortugueseCC" Type="System.String" Scope="User">
       <Value Profile="(Default)">ContentCenter\pt-BR\</Value>
     </Setting>
+    <Setting Name="VaultDB" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Idugel</Value>
+    </Setting>
+    <Setting Name="VaultSRV" Type="System.String" Scope="User">
+      <Value Profile="(Default)">eng01-srv</Value>
+    </Setting>
+    <Setting Name="VaultUser" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Administrator</Value>
+    </Setting>
+    <Setting Name="VaultPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1dugel.</Value>
+    </Setting>
+    <Setting Name="DefaultIPJ" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\KeepSoftwares\Bosch\StandardIPJ.ipj</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -9,7 +9,6 @@ using Path = System.IO.Path;
 using System.Runtime.InteropServices;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices.ComTypes;
-using Autodesk.DataManagement.Client.Framework.Vault.Forms.Controls;
 using System.Windows.Forms;
 
 namespace Bosch_ImportData
@@ -41,6 +40,10 @@ namespace Bosch_ImportData
         public string FileNameSimplificado { get; set; }
         public ProductType Type { get; set; }
         public bool isMissing { get; set; }
+        public bool isVaultExisting { get; set; }
+        public bool isNeedMove { get; set; } = false;
+        public string PathToMove { get; set; } = string.Empty;
+
         public Produto() { }
         public Produto(string _filename, string norma, bool missing = false)
         {
@@ -75,9 +78,14 @@ namespace Bosch_ImportData
             }
             else
             {
-                Type = ProductType.Desconhecido;          
+                Type = ProductType.Desconhecido;
                 NewFileName = Path.Combine(temprootPath, "DESCONHECIDO", fileInfo.Name);
             }
+
+            if (ConexaoVault.connection != null)
+                isVaultExisting = VaultHelper.FindFileByName(Path.GetFileName(NewFileName));
+
+
             FileNameSimplificado = NewFileName.Replace(temprootPath, @"$\");
         }
         private string ConvertFilePath(string originalFilePath, string oldPath)
@@ -88,4 +96,6 @@ namespace Bosch_ImportData
             return relativePath;
         }
     }
+
+
 }

@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -24,19 +25,20 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\..\KeepSoftwares\Bosch\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,42 +49,83 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Properties\keepcad.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autodesk.Connectivity.Extensibility.Framework">
+    <Reference Include="Autodesk.Connectivity.Explorer.Extensibility">
+      <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2023 SDK\bin\x64\Autodesk.Connectivity.Explorer.Extensibility.dll</HintPath>
+    </Reference>
+    <Reference Include="Autodesk.Connectivity.Extensibility.Framework, Version=28.0.0.0, Culture=neutral, PublicKeyToken=215b0879a7566597, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2023 SDK\bin\x64\Autodesk.Connectivity.Extensibility.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="Autodesk.Connectivity.JobProcessor.Extensibility">
-      <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2023 SDK\bin\x64\Autodesk.Connectivity.JobProcessor.Extensibility.dll</HintPath>
-    </Reference>
-    <Reference Include="Autodesk.Connectivity.WebServices">
+    <Reference Include="Autodesk.Connectivity.WebServices, Version=28.0.0.0, Culture=neutral, PublicKeyToken=215b0879a7566597, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2023 SDK\bin\x64\Autodesk.Connectivity.WebServices.dll</HintPath>
     </Reference>
-    <Reference Include="Autodesk.Connectivity.WebServices.WCF">
+    <Reference Include="Autodesk.Connectivity.WebServices.WCF, Version=28.5.15.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2023 SDK\bin\x64\Autodesk.Connectivity.WebServices.WCF.dll</HintPath>
     </Reference>
-    <Reference Include="Autodesk.DataManagement.Client.Framework">
+    <Reference Include="Autodesk.DataManagement.Client.Framework, Version=28.0.0.0, Culture=neutral, PublicKeyToken=215b0879a7566597, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2023 SDK\bin\x64\Autodesk.DataManagement.Client.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="Autodesk.DataManagement.Client.Framework.Forms">
+    <Reference Include="Autodesk.DataManagement.Client.Framework.Forms, Version=28.0.0.0, Culture=neutral, PublicKeyToken=215b0879a7566597, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2023 SDK\bin\x64\Autodesk.DataManagement.Client.Framework.Forms.dll</HintPath>
     </Reference>
-    <Reference Include="Autodesk.DataManagement.Client.Framework.Vault">
+    <Reference Include="Autodesk.DataManagement.Client.Framework.Vault, Version=28.0.0.0, Culture=neutral, PublicKeyToken=215b0879a7566597, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2023 SDK\bin\x64\Autodesk.DataManagement.Client.Framework.Vault.dll</HintPath>
     </Reference>
     <Reference Include="Autodesk.DataManagement.Client.Framework.Vault.Forms">
       <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2023 SDK\bin\x64\Autodesk.DataManagement.Client.Framework.Vault.Forms.dll</HintPath>
     </Reference>
-    <Reference Include="Autodesk.DataManagement.Server.Extensibility">
-      <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2023 SDK\bin\x64\Autodesk.DataManagement.Server.Extensibility.dll</HintPath>
-    </Reference>
     <Reference Include="Autodesk.Inventor.Interop, Version=29.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\Program Files\Autodesk\Inventor 2025\Bin\Public Assemblies\Autodesk.Inventor.Interop.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpCompress, Version=0.37.2.0, Culture=neutral, PublicKeyToken=afb0a02973931d96, processorArchitecture=MSIL">
+      <HintPath>packages\SharpCompress.0.37.2\lib\net462\SharpCompress.dll</HintPath>
+    </Reference>
+    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encoding.CodePages, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Encoding.CodePages.8.0.0\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -92,6 +135,9 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="ZstdSharp, Version=0.8.0.0, Culture=neutral, PublicKeyToken=8d151af33a4ad5cf, processorArchitecture=MSIL">
+      <HintPath>packages\ZstdSharp.Port.0.8.0\lib\net462\ZstdSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ImportFiles.cs">
@@ -100,8 +146,8 @@
     <Compile Include="ImportFiles.Designer.cs">
       <DependentUpon>ImportFiles.cs</DependentUpon>
     </Compile>
-    <Compile Include="InvApp.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="PluginServer.cs" />
     <Compile Include="Produto.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -119,7 +165,13 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
+    <AdditionalFiles Include="Data.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <None Include="Bosch_ImportData.X.manifest" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -148,5 +200,27 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Bosch.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\keepcad.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\Botao Importar arquivos 16x16.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\Botao Importar arquivos 32x32.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\Botao Importar arquivos 64x64.bmp" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>
