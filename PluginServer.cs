@@ -35,16 +35,16 @@ namespace Bosch_ImportData
         public string panelName = "DataImport";
 
         ButtonDefinition BotaoImportData;
-       
-        
-        
+
+
+
         public static Inventor.Application invApp;
         public static InventorServer inventorServer;
         public string inventorID;
 
 
         //private Form1 mControlForm;
-       // private Inventor.ApplicationEvents m_ApplicationEvents;
+        // private Inventor.ApplicationEvents m_ApplicationEvents;
 
 
         public dynamic Automation { get; private set; }
@@ -55,7 +55,9 @@ namespace Bosch_ImportData
 
             // Initialize AddIn members.
             //inventorServer = addInSiteObject.InventorServer;
+
             invApp = addInSiteObject.Application;
+            Parametros._invApp = addInSiteObject.Application;
 
 
             ////m_ApplicationEvents = invApp.ApplicationEvents;
@@ -63,7 +65,7 @@ namespace Bosch_ImportData
 
             //mControlForm = new Form1(invApp);
             //mControlForm.ShowModeless();
-            
+
             GuidAttribute guidAtt = (GuidAttribute)System.Attribute.GetCustomAttribute(typeof(PluginServer), typeof(GuidAttribute));
             inventorID = "{" + guidAtt.Value + "}";
 
@@ -114,12 +116,25 @@ namespace Bosch_ImportData
             //painelAssembly.CommandControls.AddButton(BotaoImportData, true);
             //painelDrawing.CommandControls.AddButton(BotaoImportData, true);
             painelZero.CommandControls.AddButton(BotaoImportData, true);
-           
+
             BotaoImportData.OnExecute += new ButtonDefinitionSink_OnExecuteEventHandler(CarregarUI_ImportData);
 
 
-           
 
+
+        }
+
+        public void Deactivate()
+        {
+            Trace.TraceInformation(": BoschAutomation: deactivating... ");
+
+            // Release objects.
+            invApp = null;
+            // Marshal.ReleaseComObject(invApp);
+
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         void CarregarUI_ImportData(NameValueMap Content)
@@ -135,22 +150,6 @@ namespace Bosch_ImportData
         //    HandlingCode = HandlingCodeEnum.kEventHandled;
         //}
 
-
-
-
-
-        public void Deactivate()
-        {
-            Trace.TraceInformation(": BoschAutomation: deactivating... ");
-
-            // Release objects.
-            invApp = null;
-           // Marshal.ReleaseComObject(invApp);
-            
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-        }
 
         public void ExecuteCommand(int CommandID)
         {

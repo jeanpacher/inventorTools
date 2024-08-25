@@ -26,14 +26,21 @@ namespace Bosch_ImportData
     public class Norma
     {
         public string CodigoNorma { get; set; }
-        public AssemblyDocument oAsmDoc { get; set; }
         public List<Produto> Produtos = new List<Produto>();
+        public AssemblyDocument oAsmDoc { get; set; }
+
+        public Produto GetNewProduct(string filename, bool _isMissing)
+        {
+            Produto produto = new Produto(filename, CodigoNorma, _isMissing);
+            Produtos.Add(produto);
+
+            return produto;
+        }
     }
     public class Produto
     {
         public string temprootPath { get; set; } = Properties.Settings.Default.tempVaultRootPath;
         public string projectPath { get; set; } = Properties.Settings.Default.ProjectRootPath;
-
         public TreeNode node;
         public string Filename { get; set; }
         public string NewFileName { get; set; }
@@ -45,16 +52,17 @@ namespace Bosch_ImportData
         public string PathToMove { get; set; } = string.Empty;
 
         public Produto() { }
-        public Produto(string _filename, string norma, bool missing = false)
+        public Produto(string _filename, string CodNorma, bool missing)
         {
             isMissing = missing;
             Filename = _filename;
             FileInfo fileInfo = new FileInfo(Filename);
             string name = Path.GetFileNameWithoutExtension(Filename);
-            if (name.StartsWith(norma))
+
+            if (name.StartsWith(CodNorma))
             {
                 Type = ProductType.Norma;
-                NewFileName = Path.Combine(temprootPath, projectPath, norma, fileInfo.Name);
+                NewFileName = Path.Combine(temprootPath, projectPath, CodNorma, fileInfo.Name);
             }
             else if (Filename.Contains("Content Center Files"))
             {
@@ -71,10 +79,19 @@ namespace Bosch_ImportData
                 Type = ProductType.ATMOLIB_ProdutosBosch;
                 NewFileName = Path.Combine(temprootPath, Properties.Settings.Default.ProdutosBosch, ConvertFilePath(Filename, "Produtos Bosch"));
             }
+
             else if (name.StartsWith("43") || name.StartsWith("45") || name.StartsWith("46") || name.StartsWith("47"))
             {
                 Type = ProductType.NormaAuxiliar;
                 NewFileName = Path.Combine(temprootPath, projectPath, fileInfo.Directory.Name, fileInfo.Name);
+            }
+
+
+            else if (name.StartsWith(Directory.GetParent(Filename).Name))
+            {
+                
+                Type = ProductType.ATMOLIB_Library;
+                NewFileName = Path.Combine(temprootPath, Properties.Settings.Default.Catalog, ConvertFilePath(Filename, "Produtos Bosch"));
             }
             else
             {
@@ -82,12 +99,18 @@ namespace Bosch_ImportData
                 NewFileName = Path.Combine(temprootPath, "DESCONHECIDO", fileInfo.Name);
             }
 
-            if (ConexaoVault.connection != null)
+            if (VaultHelper.connection != null)
                 isVaultExisting = VaultHelper.FindFileByName(Path.GetFileName(NewFileName));
 
 
             FileNameSimplificado = NewFileName.Replace(temprootPath, @"$\");
         }
+
+        private bool IsProdutoBosch()
+        {
+            return true;
+        }
+
         private string ConvertFilePath(string originalFilePath, string oldPath)
         {
             // Remove a parte inicial e substitui por "C:\

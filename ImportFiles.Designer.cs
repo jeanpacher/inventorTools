@@ -26,7 +26,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("$");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("$");
             this.label1 = new System.Windows.Forms.Label();
             this.txtZipFileName = new System.Windows.Forms.TextBox();
             this.btnSearchZip = new System.Windows.Forms.Button();
@@ -155,11 +155,11 @@
             this.TreeBosch.ItemHeight = 24;
             this.TreeBosch.Location = new System.Drawing.Point(0, 0);
             this.TreeBosch.Name = "TreeBosch";
-            treeNode1.Name = "Node0";
-            treeNode1.Tag = "root";
-            treeNode1.Text = "$";
+            treeNode2.Name = "Node0";
+            treeNode2.Tag = "root";
+            treeNode2.Text = "$";
             this.TreeBosch.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1});
+            treeNode2});
             this.TreeBosch.Size = new System.Drawing.Size(393, 715);
             this.TreeBosch.TabIndex = 14;
             this.TreeBosch.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewNorma_AfterSelect);
@@ -437,7 +437,7 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "ImportFiles";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "BOSCH";
+            this.Text = "BOSCH - NÃO CONECTADO";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ImportFiles_FormClosing);
             this.Load += new System.EventHandler(this.ImportFiles_Load);
             this.subMenu.ResumeLayout(false);

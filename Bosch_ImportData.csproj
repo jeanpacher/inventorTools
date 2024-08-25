@@ -152,6 +152,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TreeViewBosch.cs" />
+    <Compile Include="Parametros.cs" />
     <Compile Include="VaultInterface.cs" />
     <Compile Include="ZipfileManipulate.cs" />
     <EmbeddedResource Include="ImportFiles.resx">

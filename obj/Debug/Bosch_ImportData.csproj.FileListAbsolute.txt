@@ -98,7 +98,6 @@ C:\Users\Jean\source\repos\inventorTools01\bin\Debug\Bosch_ImportData.dll.config
 C:\Users\Jean\source\repos\inventorTools01\bin\Debug\Bosch_ImportData.dll
 C:\KeepSoftwares\Bosch\StandardIPJ.ipj
 C:\KeepSoftwares\Bosch\Data.json
-C:\KeepSoftwares\Bosch\Bosch_ImportData.dll
 C:\KeepSoftwares\Bosch\Bosch_ImportData.pdb
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.csproj.AssemblyReference.cache
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.ImportFiles.resources
