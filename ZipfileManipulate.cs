@@ -11,11 +11,11 @@ namespace Bosch_ImportData
     public class ZipfileManipulate
     {
         private DataGridView tabela;
-        //public Dictionary<string, Produto> dicionarioProdutos = new Dictionary<string, Produto>();
-
-        public ZipfileManipulate(DataGridView _tabela)
+        public ImageList ImageList;
+        public ZipfileManipulate(DataGridView _tabela, ImageList _imageList)
         {
             tabela = _tabela;
+            ImageList = _imageList;
         }
         
         public Norma ExtractZip(string zipFilePath)
@@ -86,8 +86,12 @@ namespace Bosch_ImportData
         }
         public void CreateFirstTable(Produto prod)
         {
-            int rowIndex = tabela.Rows.Add(prod.Type.ToString(),
+            string displayName = TableFormat.GetDisplayName(prod);
+
+            int rowIndex = tabela.Rows.Add(
+                    prod.Type.ToString(),
                     prod.isVaultExisting,
+                   ImageList.Images[prod.image],
                     $"{Path.GetFileName(prod.NewFileName)}",
                     "BOTAO EXTRA",
                     prod.NewFileName);

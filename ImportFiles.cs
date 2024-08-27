@@ -22,6 +22,7 @@ using File = System.IO.File;
 using Color = System.Drawing.Color;
 using config = Bosch_ImportData.Properties.Settings;
 using VDF = Autodesk.DataManagement.Client.Framework;
+using System.Threading;
 
 
 namespace Bosch_ImportData
@@ -39,7 +40,7 @@ namespace Bosch_ImportData
             InitializeComponent();
             //_invApp = invApp;
         }
-       
+
         private void ImportFiles_Load(object sender, EventArgs e)
         {
             this.Show();
@@ -49,10 +50,11 @@ namespace Bosch_ImportData
             {
                 MessageBox.Show("Não foi possivel conectar no Autodesk Vault. Verifique a conexão com o servidor." +
                     "O software será encerrado", "ERRO DE CONEXÂO COM O VAULT", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
-                this.Close();
+                //this.Close();
             }
 
             this.Text = "BOSCH - CONECTADO";
+
             ToggleWaitCursor(false);
         }
         private void ImportFiles_FormClosing(object sender, FormClosingEventArgs e)
@@ -85,34 +87,33 @@ namespace Bosch_ImportData
 
             codNorma = new Norma();         // Reinicializa codNorma para garantir que está limpo
             SetTemporaryPaths();
-            ExtractFilesFromZip(txtZipFileName.Text);
+
+            if (!ExtractFilesFromZip(txtZipFileName.Text)) return;
+
             CreateTextFileWithFileNames();
 
-            if (VerifyLinks())
-            {
-                MessageBox.Show("TODOS OS ARQUIVOS NECESSÁRIOS FORAM ENCONTRADOS");
-            }
-            else
-            {
-                MessageBox.Show("EXISTEM VINCULADOS DE ARQUIVOS FALTANDO NA MONTAGEM PRINCIPAL.");
-            }
+            //if (VerifyLinks())          
+            //    MessageBox.Show("TODOS OS ARQUIVOS NECESSÁRIOS FORAM ENCONTRADOS");        
+            //else       
+            //    MessageBox.Show("EXISTEM VINCULADOS DE ARQUIVOS FALTANDO NA MONTAGEM PRINCIPAL");
 
             PopulateTreeView();
+            CriarTabelaDesconhecida();
             ToggleWaitCursor(false);
         }
 
         private void tabelaItens_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == 3)
-            {
-                MessageBox.Show(tabelaItens.Rows[e.RowIndex].Cells[2].Value.ToString());
-            }
+            //if (e.ColumnIndex == 3)
+            //{
+            //    MessageBox.Show(tabelaItens.Rows[e.RowIndex].Cells[2].Value.ToString());
+            //}
         }
         private void tabelaItens_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             if (Parametros.isSystemChange)
                 return;
-            if (e.ColumnIndex == 2) // Supondo que a coluna de índice 1 seja a que contém o nome do arquivo
+            if (e.ColumnIndex == 3) // Supondo que a coluna de índice 1 seja a que contém o nome do arquivo
             {
                 string oldFileName = (string)tabelaItens.Rows[e.RowIndex].Cells["originalNameColumn"].Value;
                 string newFileName = (string)tabelaItens.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
@@ -142,7 +143,7 @@ namespace Bosch_ImportData
                 }
             }
         }
-        
+
         private void TreeViewNorma_AfterSelect(object sender, TreeViewEventArgs e)
         {
             Parametros.isSystemChange = true;
@@ -155,53 +156,54 @@ namespace Bosch_ImportData
             DataTableUpdate(e.Node.Nodes);
             Parametros.isSystemChange = false;
         }
-        
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (codNorma == null) return;
+
             if (tabControl1.SelectedTab.Text == "DESCONHECIDOS")
             {
-                txtFolderToMove.Visible = true;
-                btnMover.Visible = true;
-                cbLocation.Visible = true;
-
-
-                foreach (Produto prod in codNorma.Produtos)
-                {
-                    if (prod.Type == ProductType.Desconhecido)
-                    {
-                        newRowDesconhecido(prod);
-                    }
-                }
-
-                // Aqui você pode adicionar qualquer lógica necessária, como carregar dados ou atualizar o conteúdo da aba
+                CriarTabelaDesconhecida();
             }
 
             if (tabControl1.SelectedTab.Text == "TABELA")
             {
-                txtFolderToMove.Visible = false;
-                btnMover.Visible = false;
-                cbLocation.Visible = false;
+                TreeBosch.SelectedNode = TreeBosch.TopNode;
             }
 
 
 
         }
-        
+
         private void cbLocation_SelectedIndexChanged(object sender, EventArgs e)
         {
             txtFolderToMove.Items.Clear();
             txtFolderToMove.Text = string.Empty;
 
-            List<string> ListasPastasDisponiveis = new List<string>();
-            ListasPastasDisponiveis = VaultHelper.GetChildrenFoldersByFolderName(cbLocation.Text);
-
-            Log.gravarLog(ListasPastasDisponiveis.Count().ToString());
-            foreach (string item in ListasPastasDisponiveis)
+            if (cbLocation.Text == "PastasExistentes")
             {
-                Log.gravarLog(item);
-                txtFolderToMove.Items.Add(item);
+                txtFolderToMove.Items.AddRange(Parametros.TreeViewPastas.ToArray());
             }
+            else
+            {
+                List<string> ListasPastasDisponiveis = new List<string>();
+                ListasPastasDisponiveis = VaultHelper.GetChildrenFoldersByFolderName(cbLocation.Text);
+                string nodeString = cbLocation.Text.Split('/').Last();
+                TreeViewBosch tb = new TreeViewBosch();
+                TreeNode node = tb.FindAllNode(TreeBosch, nodeString);
 
+                if (node != null && node.Nodes.Count > 0)
+                {
+                    foreach (TreeNode nodeChildren in node.Nodes)
+                    {
+                        if (!ListasPastasDisponiveis.Contains(nodeChildren.Text))
+                        {
+                            ListasPastasDisponiveis.Add(nodeChildren.Text);
+                        }
+                    }
+                }
+                ListasPastasDisponiveis.Sort();
+                txtFolderToMove.Items.AddRange(ListasPastasDisponiveis.ToArray());
+            }
         }
         private void subMenu_Opening(object sender, CancelEventArgs e)
         {
@@ -213,40 +215,40 @@ namespace Bosch_ImportData
                 e.Cancel = true;
                 return;
             }
-            moverParaNormaToolStripMenuItem.Enabled = true;
-            moverParaCCToolStripMenuItem.Enabled = true;
-            moverParaATMOLIBToolStripMenuItem.Enabled = true;
+            CheckAll.Enabled = true;
+            UncheckAll.Enabled = true;
         }
 
         #endregion
-
-
-        private void CreateReportFilesFromProdutos()
+        private void ToggleWaitCursor(bool isWaitCursor)
         {
-            foreach (Produto prod in codNorma.Produtos)
-            {
-                string filePath = config.Default.tempVaultRootPath + codNorma.CodigoNorma + ".txt";
-                File.AppendAllText(filePath, prod.NewFileName + System.Environment.NewLine);
-            }
+            this.UseWaitCursor = isWaitCursor;
         }
         private void ClearUI()
         {
             TreeBosch.Nodes.Clear();
             tabelaItens.Rows.Clear();
-        }
-        private void ToggleWaitCursor(bool isWaitCursor)
-        {
-            this.UseWaitCursor = isWaitCursor;
-        }
-        private void ExtractFilesFromZip(string zipFileName)
-        {
-            ZipfileManipulate zipfileManipulate = new ZipfileManipulate(tabelaItens);
-            codNorma = zipfileManipulate.ExtractZip(zipFileName);
+            TabelaDesconhecidos.Rows.Clear();
         }
         private void SetTemporaryPaths()
         {
             Properties.Settings.Default.tempVaultRootPath = Path.Combine(Parametros.tempLocation, Path.GetFileNameWithoutExtension(Path.GetTempFileName()));
             Parametros.ipjPadrao = Path.Combine(config.Default.tempVaultRootPath, Parametros.ipjFileName);
+        }
+        private bool ExtractFilesFromZip(string zipFileName)
+        {
+
+            if (string.IsNullOrEmpty(zipFileName) || !File.Exists(zipFileName))
+            {
+                ToggleWaitCursor(false);
+                return false;
+            }
+
+
+            ZipfileManipulate zipfileManipulate = new ZipfileManipulate(tabelaItens, LIstaIcones);
+            codNorma = zipfileManipulate.ExtractZip(zipFileName);
+
+            return true;
         }
         private void PopulateTreeView()
         {
@@ -321,66 +323,31 @@ namespace Bosch_ImportData
                 }
             }
         }
-
-        private string GetDisplayName(Produto prod)
+        private void CreateReportFilesFromProdutos()
         {
-            if (prod.Type == ProductType.Desconhecido)
+            foreach (Produto prod in codNorma.Produtos)
             {
-                return $"{Path.GetFileName(prod.NewFileName)} - {prod.Filename}";
+                string filePath = config.Default.tempVaultRootPath + codNorma.CodigoNorma + ".txt";
+                File.AppendAllText(filePath, prod.NewFileName + System.Environment.NewLine);
             }
-
-            return Path.GetFileName(prod.NewFileName);
         }
-        public Color GetRowColor(Produto prod)
-        {
-            if (prod.isMissing)
-            {
-                return Color.Red;
-            }
 
-            if (prod.Type == ProductType.Desconhecido)
-            {
-                return Color.MediumVioletRed;
-            }
 
-            if (prod.Type == ProductType.ATMOLIB_Library)
-            {
-                // AtmoLib Filename: FABRICANTE - CATALOGCODE
-                // AtmoLib FolderPath: FABRICANTE
-                string FilenamePath = Path.GetFileNameWithoutExtension(prod.NewFileName);
-                string FolderPath = prod.node?.Parent?.Text;
-
-                if (!FilenamePath.StartsWith(FolderPath))
-                {
-                    return Color.BlueViolet;
-                }
-            }
-
-            return Color.Black;
-        }
-        private int AddRowToTabelaItens(Produto prod)
-        {
-            string displayName = GetDisplayName(prod);
-
-            return tabelaItens.Rows.Add(
-                prod.Type.ToString(),
-                prod.isVaultExisting,
-                displayName,
-                " BOTAO EXTRA ",
-                prod.NewFileName
-            );
-        }
         public void NewTableRow(Produto prod)
         {
-            int rowIndex = AddRowToTabelaItens(prod);
-            tabelaItens.Rows[rowIndex].DefaultCellStyle.ForeColor = GetRowColor(prod);
+            string displayName = TableFormat.GetDisplayName(prod);
 
+            int rowIndex = tabelaItens.Rows.Add(
+               prod.Type.ToString(),
+               prod.isVaultExisting,
+               LIstaIcones.Images[prod.image],
+               displayName,
+               " BOTAO EXTRA ",
+               prod.NewFileName);
+
+
+            tabelaItens.Rows[rowIndex].DefaultCellStyle.ForeColor = TableFormat.GetRowColor(prod);
         }
-
-
-      
-
-
 
         public void DataTableUpdate(TreeNodeCollection nodes)
         {
@@ -443,7 +410,6 @@ namespace Bosch_ImportData
 
 
 
-
         // Método para validar o nome do arquivo
         private bool IsValidFileName(string fileName)
         {
@@ -479,16 +445,123 @@ namespace Bosch_ImportData
 
             int rowIndex = TabelaDesconhecidos.Rows.Add(
                     false,
-                    prod.isVaultExisting,
                     $"{Path.GetFileName(prod.NewFileName)}",
-                    prod.NewFileName);
+                    prod.Filename);
         }
 
+        private void CriarTabelaDesconhecida()
+        {
+            TabelaDesconhecidos.Rows.Clear();
+            foreach (Produto prod in codNorma.Produtos)
+            {
+                if (prod.Type == ProductType.Desconhecido)
+                {
+                    newRowDesconhecido(prod);
+                }
+            }
+        }
 
+        private void btnMover_Click(object sender, EventArgs e)
+        {
+            MoverArquivo();
+        }
 
+        public void MoverArquivo()
+        {
+            foreach (DataGridViewRow row in TabelaDesconhecidos.SelectedRows)
+            {
+                string NewFilenameMoved = Path.Combine(cbLocation.Text, txtFolderToMove.Text, row.Cells[1].Value.ToString());
+                MessageBox.Show(NewFilenameMoved);
+            }
+            if (cbLocation.Text == @"$/ATMOLIB/Library/Catalog")
+            {
 
+            }
+            else if (cbLocation.Text == @"ATMOLIB/Produtos Bosch")
+            {
+
+            }
+            else if (cbLocation.Text == @"$/ContentCenter/en-US")
+            {
+
+            }
+            else if (cbLocation.Text == @"$/ContentCenter/pt-PT")
+            {
+
+            }
+            else if (cbLocation.Text == @"$/ContentCenter/pt-BR")
+            {
+
+            }
+            else if (cbLocation.Text == @"$/Sites/CtP_TEF/project")
+            {
+            }
+            else if (cbLocation.Text == @"PastasExistentes")
+            {
+
+            }
+
+        }
+
+        private void CheckAll_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in TabelaDesconhecidos.SelectedRows)
+            {
+                row.Cells[0].Value = true;
+            }
+        }
+
+        private void UncheckAll_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in TabelaDesconhecidos.SelectedRows)
+            {
+                row.Cells[0].Value = false;
+            }
+        }
+    }
+
+    public static class TableFormat
+    {
+        public static string GetDisplayName(Produto prod)
+        {
+            if (prod.Type == ProductType.Desconhecido)
+            {
+                return $"{Path.GetFileName(prod.NewFileName)} - {prod.Filename}";
+            }
+
+            return Path.GetFileName(prod.NewFileName);
+        }
+        public static Color GetRowColor(Produto prod)
+        {
+            if (prod.isMissing)
+            {
+                return Color.Red;
+            }
+
+            if (prod.Type == ProductType.Desconhecido)
+            {
+                return Color.MediumVioletRed;
+            }
+
+            if (prod.Type == ProductType.ATMOLIB_Library)
+            {
+                // AtmoLib Filename: FABRICANTE - CATALOGCODE
+                // AtmoLib FolderPath: FABRICANTE
+                string FilenamePath = Path.GetFileNameWithoutExtension(prod.NewFileName);
+                string FolderPath = prod.node?.Parent?.Text;
+
+                if (!FilenamePath.StartsWith(FolderPath))
+                {
+                    return Color.BlueViolet;
+                }
+            }
+            return Color.Black;
+        }
     }
 }
+
+
+
 //private void ListarObjetos(Norma norma, string root)
 //{
 //    LV_NORMA.View = System.Windows.Forms.View.Details;

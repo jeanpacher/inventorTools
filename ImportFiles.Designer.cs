@@ -26,50 +26,51 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("$");
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("$");
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportFiles));
             this.label1 = new System.Windows.Forms.Label();
             this.txtZipFileName = new System.Windows.Forms.TextBox();
             this.btnSearchZip = new System.Windows.Forms.Button();
             this.btnExtrair = new System.Windows.Forms.Button();
             this.subMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.moverParaCCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.moverParaATMOLIBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.moverParaNormaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TreeBosch = new System.Windows.Forms.TreeView();
-            this.ListaLV = new System.Windows.Forms.ListView();
-            this.DirectoryCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.FileNameCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.StatusCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabDesconhecidos = new System.Windows.Forms.TabPage();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.TabelaDesconhecidos = new System.Windows.Forms.DataGridView();
+            this.ColunaCheck = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.btnMover = new System.Windows.Forms.Button();
+            this.txtFolderToMove = new System.Windows.Forms.ComboBox();
+            this.cbLocation = new System.Windows.Forms.ComboBox();
             this.tabTabela = new System.Windows.Forms.TabPage();
             this.tabelaItens = new System.Windows.Forms.DataGridView();
             this.ColunaTipo = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.VaultExistColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.ColunaExtensaoArquivo = new System.Windows.Forms.DataGridViewImageColumn();
             this.ColunaName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColunaFind = new System.Windows.Forms.DataGridViewButtonColumn();
             this.originalNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.tabDesconhecidos = new System.Windows.Forms.TabPage();
-            this.TabelaDesconhecidos = new System.Windows.Forms.DataGridView();
-            this.ColunaCheck = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.dataGridViewCheckBoxColumn1 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.btnMover = new System.Windows.Forms.Button();
-            this.txtFolderToMove = new System.Windows.Forms.ComboBox();
-            this.cbLocation = new System.Windows.Forms.ComboBox();
+            this.LIstaIcones = new System.Windows.Forms.ImageList(this.components);
+            this.normaBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.CheckAll = new System.Windows.Forms.ToolStripTextBox();
+            this.UncheckAll = new System.Windows.Forms.ToolStripTextBox();
             this.subMenu.SuspendLayout();
             this.tabControl1.SuspendLayout();
-            this.tabTabela.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tabelaItens)).BeginInit();
             this.tabDesconhecidos.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TabelaDesconhecidos)).BeginInit();
+            this.tabTabela.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabelaItens)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.normaBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -115,88 +116,36 @@
             // 
             // subMenu
             // 
-            this.subMenu.Enabled = false;
             this.subMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.subMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.moverParaCCToolStripMenuItem,
-            this.moverParaATMOLIBToolStripMenuItem,
-            this.moverParaNormaToolStripMenuItem});
+            this.CheckAll,
+            this.UncheckAll});
             this.subMenu.Name = "subMenu";
-            this.subMenu.Size = new System.Drawing.Size(219, 70);
+            this.subMenu.Size = new System.Drawing.Size(301, 54);
             this.subMenu.Opening += new System.ComponentModel.CancelEventHandler(this.subMenu_Opening);
-            // 
-            // moverParaCCToolStripMenuItem
-            // 
-            this.moverParaCCToolStripMenuItem.Enabled = false;
-            this.moverParaCCToolStripMenuItem.Name = "moverParaCCToolStripMenuItem";
-            this.moverParaCCToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.moverParaCCToolStripMenuItem.Text = "Mover para Content Center";
-            // 
-            // moverParaATMOLIBToolStripMenuItem
-            // 
-            this.moverParaATMOLIBToolStripMenuItem.Enabled = false;
-            this.moverParaATMOLIBToolStripMenuItem.Name = "moverParaATMOLIBToolStripMenuItem";
-            this.moverParaATMOLIBToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.moverParaATMOLIBToolStripMenuItem.Text = "Mover para ATMO LIB";
-            // 
-            // moverParaNormaToolStripMenuItem
-            // 
-            this.moverParaNormaToolStripMenuItem.Enabled = false;
-            this.moverParaNormaToolStripMenuItem.Name = "moverParaNormaToolStripMenuItem";
-            this.moverParaNormaToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.moverParaNormaToolStripMenuItem.Text = "Mover para Norma";
             // 
             // TreeBosch
             // 
             this.TreeBosch.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.TreeBosch.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TreeBosch.Font = new System.Drawing.Font("Microsoft New Tai Lue", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TreeBosch.Font = new System.Drawing.Font("Microsoft New Tai Lue", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TreeBosch.FullRowSelect = true;
-            this.TreeBosch.ItemHeight = 24;
+            this.TreeBosch.ItemHeight = 20;
             this.TreeBosch.Location = new System.Drawing.Point(0, 0);
             this.TreeBosch.Name = "TreeBosch";
-            treeNode2.Name = "Node0";
-            treeNode2.Tag = "root";
-            treeNode2.Text = "$";
+            treeNode1.Name = "Node0";
+            treeNode1.Tag = "root";
+            treeNode1.Text = "$";
             this.TreeBosch.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode2});
+            treeNode1});
             this.TreeBosch.Size = new System.Drawing.Size(393, 715);
             this.TreeBosch.TabIndex = 14;
             this.TreeBosch.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewNorma_AfterSelect);
             // 
-            // ListaLV
-            // 
-            this.ListaLV.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.DirectoryCol,
-            this.FileNameCol,
-            this.StatusCol});
-            this.ListaLV.HideSelection = false;
-            this.ListaLV.Location = new System.Drawing.Point(0, 0);
-            this.ListaLV.Name = "ListaLV";
-            this.ListaLV.Size = new System.Drawing.Size(807, 689);
-            this.ListaLV.TabIndex = 15;
-            this.ListaLV.UseCompatibleStateImageBehavior = false;
-            this.ListaLV.View = System.Windows.Forms.View.Details;
-            // 
-            // DirectoryCol
-            // 
-            this.DirectoryCol.Text = "Diretório";
-            this.DirectoryCol.Width = 200;
-            // 
-            // FileNameCol
-            // 
-            this.FileNameCol.Text = "Filename";
-            this.FileNameCol.Width = 400;
-            // 
-            // StatusCol
-            // 
-            this.StatusCol.Text = "Status";
-            this.StatusCol.Width = 100;
-            // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabTabela);
             this.tabControl1.Controls.Add(this.tabDesconhecidos);
+            this.tabControl1.Controls.Add(this.tabTabela);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
@@ -204,6 +153,122 @@
             this.tabControl1.Size = new System.Drawing.Size(814, 715);
             this.tabControl1.TabIndex = 16;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            // 
+            // tabDesconhecidos
+            // 
+            this.tabDesconhecidos.Controls.Add(this.label3);
+            this.tabDesconhecidos.Controls.Add(this.label2);
+            this.tabDesconhecidos.Controls.Add(this.TabelaDesconhecidos);
+            this.tabDesconhecidos.Controls.Add(this.btnMover);
+            this.tabDesconhecidos.Controls.Add(this.txtFolderToMove);
+            this.tabDesconhecidos.Controls.Add(this.cbLocation);
+            this.tabDesconhecidos.Location = new System.Drawing.Point(4, 22);
+            this.tabDesconhecidos.Name = "tabDesconhecidos";
+            this.tabDesconhecidos.Padding = new System.Windows.Forms.Padding(3);
+            this.tabDesconhecidos.Size = new System.Drawing.Size(806, 689);
+            this.tabDesconhecidos.TabIndex = 1;
+            this.tabDesconhecidos.Text = "DESCONHECIDOS";
+            this.tabDesconhecidos.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(261, 13);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(69, 13);
+            this.label3.TabIndex = 22;
+            this.label3.Text = "CATEGORIA";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 13);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(69, 13);
+            this.label2.TabIndex = 21;
+            this.label2.Text = "CATEGORIA";
+            // 
+            // TabelaDesconhecidos
+            // 
+            this.TabelaDesconhecidos.AllowUserToAddRows = false;
+            this.TabelaDesconhecidos.AllowUserToDeleteRows = false;
+            this.TabelaDesconhecidos.AllowUserToResizeRows = false;
+            this.TabelaDesconhecidos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.TabelaDesconhecidos.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.ColunaCheck,
+            this.dataGridViewTextBoxColumn1,
+            this.dataGridViewTextBoxColumn2});
+            this.TabelaDesconhecidos.ContextMenuStrip = this.subMenu;
+            this.TabelaDesconhecidos.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.TabelaDesconhecidos.Location = new System.Drawing.Point(3, 61);
+            this.TabelaDesconhecidos.Margin = new System.Windows.Forms.Padding(1, 3, 3, 3);
+            this.TabelaDesconhecidos.Name = "TabelaDesconhecidos";
+            this.TabelaDesconhecidos.RowHeadersWidth = 51;
+            this.TabelaDesconhecidos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.TabelaDesconhecidos.Size = new System.Drawing.Size(800, 625);
+            this.TabelaDesconhecidos.StandardTab = true;
+            this.TabelaDesconhecidos.TabIndex = 16;
+            // 
+            // ColunaCheck
+            // 
+            this.ColunaCheck.HeaderText = "ITEM";
+            this.ColunaCheck.MinimumWidth = 6;
+            this.ColunaCheck.Name = "ColunaCheck";
+            this.ColunaCheck.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.ColunaCheck.Width = 80;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.HeaderText = "NAME";
+            this.dataGridViewTextBoxColumn1.MinimumWidth = 6;
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.Width = 250;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewTextBoxColumn2.HeaderText = "NomeOriginal";
+            this.dataGridViewTextBoxColumn2.MinimumWidth = 6;
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            // 
+            // btnMover
+            // 
+            this.btnMover.Location = new System.Drawing.Point(566, 32);
+            this.btnMover.Name = "btnMover";
+            this.btnMover.Size = new System.Drawing.Size(122, 23);
+            this.btnMover.TabIndex = 17;
+            this.btnMover.Text = "Mover Selecionados";
+            this.btnMover.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.btnMover.UseVisualStyleBackColor = true;
+            this.btnMover.Click += new System.EventHandler(this.btnMover_Click);
+            // 
+            // txtFolderToMove
+            // 
+            this.txtFolderToMove.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
+            this.txtFolderToMove.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.txtFolderToMove.FormattingEnabled = true;
+            this.txtFolderToMove.Location = new System.Drawing.Point(261, 33);
+            this.txtFolderToMove.Name = "txtFolderToMove";
+            this.txtFolderToMove.Size = new System.Drawing.Size(287, 21);
+            this.txtFolderToMove.TabIndex = 19;
+            // 
+            // cbLocation
+            // 
+            this.cbLocation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbLocation.FormattingEnabled = true;
+            this.cbLocation.Items.AddRange(new object[] {
+            "$/ATMOLIB/Library/Catalog",
+            "$/ATMOLIB/Produtos Bosch",
+            "$/Sites/CtP_TEF/project",
+            "$/ContentCenter/en-US",
+            "$/ContentCenter/pt-BR",
+            "$/ContentCenter/pt-PT",
+            "PastasExistentes"});
+            this.cbLocation.Location = new System.Drawing.Point(6, 33);
+            this.cbLocation.Name = "cbLocation";
+            this.cbLocation.Size = new System.Drawing.Size(211, 21);
+            this.cbLocation.TabIndex = 20;
+            this.cbLocation.SelectedIndexChanged += new System.EventHandler(this.cbLocation_SelectedIndexChanged);
             // 
             // tabTabela
             // 
@@ -220,15 +285,16 @@
             // 
             this.tabelaItens.AllowUserToAddRows = false;
             this.tabelaItens.AllowUserToDeleteRows = false;
+            this.tabelaItens.AllowUserToOrderColumns = true;
             this.tabelaItens.AllowUserToResizeRows = false;
             this.tabelaItens.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.tabelaItens.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ColunaTipo,
             this.VaultExistColumn,
+            this.ColunaExtensaoArquivo,
             this.ColunaName,
             this.ColunaFind,
             this.originalNameColumn});
-            this.tabelaItens.ContextMenuStrip = this.subMenu;
             this.tabelaItens.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabelaItens.Location = new System.Drawing.Point(3, 3);
             this.tabelaItens.Name = "tabelaItens";
@@ -241,7 +307,7 @@
             // 
             // ColunaTipo
             // 
-            this.ColunaTipo.HeaderText = "TIPO";
+            this.ColunaTipo.HeaderText = "CATEGORIA";
             this.ColunaTipo.Items.AddRange(new object[] {
             "Norma",
             "ATMOLIB_Library",
@@ -252,15 +318,24 @@
             this.ColunaTipo.MinimumWidth = 6;
             this.ColunaTipo.Name = "ColunaTipo";
             this.ColunaTipo.ReadOnly = true;
+            this.ColunaTipo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.ColunaTipo.Width = 150;
             // 
             // VaultExistColumn
             // 
+            this.VaultExistColumn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.VaultExistColumn.HeaderText = "Vault Exist";
             this.VaultExistColumn.MinimumWidth = 6;
             this.VaultExistColumn.Name = "VaultExistColumn";
-            this.VaultExistColumn.ReadOnly = true;
+            this.VaultExistColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.VaultExistColumn.Width = 80;
+            // 
+            // ColunaExtensaoArquivo
+            // 
+            this.ColunaExtensaoArquivo.HeaderText = "TIPO";
+            this.ColunaExtensaoArquivo.Name = "ColunaExtensaoArquivo";
+            this.ColunaExtensaoArquivo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.ColunaExtensaoArquivo.Width = 60;
             // 
             // ColunaName
             // 
@@ -285,69 +360,6 @@
             this.originalNameColumn.Name = "originalNameColumn";
             this.originalNameColumn.Visible = false;
             this.originalNameColumn.Width = 125;
-            // 
-            // tabDesconhecidos
-            // 
-            this.tabDesconhecidos.Controls.Add(this.TabelaDesconhecidos);
-            this.tabDesconhecidos.Controls.Add(this.ListaLV);
-            this.tabDesconhecidos.Location = new System.Drawing.Point(4, 22);
-            this.tabDesconhecidos.Name = "tabDesconhecidos";
-            this.tabDesconhecidos.Padding = new System.Windows.Forms.Padding(3);
-            this.tabDesconhecidos.Size = new System.Drawing.Size(806, 689);
-            this.tabDesconhecidos.TabIndex = 1;
-            this.tabDesconhecidos.Text = "DESCONHECIDOS";
-            this.tabDesconhecidos.UseVisualStyleBackColor = true;
-            // 
-            // TabelaDesconhecidos
-            // 
-            this.TabelaDesconhecidos.AllowUserToAddRows = false;
-            this.TabelaDesconhecidos.AllowUserToDeleteRows = false;
-            this.TabelaDesconhecidos.AllowUserToResizeRows = false;
-            this.TabelaDesconhecidos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.TabelaDesconhecidos.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ColunaCheck,
-            this.dataGridViewCheckBoxColumn1,
-            this.dataGridViewTextBoxColumn1,
-            this.dataGridViewTextBoxColumn2});
-            this.TabelaDesconhecidos.ContextMenuStrip = this.subMenu;
-            this.TabelaDesconhecidos.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TabelaDesconhecidos.Location = new System.Drawing.Point(3, 3);
-            this.TabelaDesconhecidos.Name = "TabelaDesconhecidos";
-            this.TabelaDesconhecidos.RowHeadersWidth = 51;
-            this.TabelaDesconhecidos.Size = new System.Drawing.Size(800, 683);
-            this.TabelaDesconhecidos.StandardTab = true;
-            this.TabelaDesconhecidos.TabIndex = 16;
-            // 
-            // ColunaCheck
-            // 
-            this.ColunaCheck.HeaderText = "ITEM";
-            this.ColunaCheck.MinimumWidth = 6;
-            this.ColunaCheck.Name = "ColunaCheck";
-            this.ColunaCheck.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.ColunaCheck.Width = 80;
-            // 
-            // dataGridViewCheckBoxColumn1
-            // 
-            this.dataGridViewCheckBoxColumn1.HeaderText = "Vault Exist";
-            this.dataGridViewCheckBoxColumn1.MinimumWidth = 6;
-            this.dataGridViewCheckBoxColumn1.Name = "dataGridViewCheckBoxColumn1";
-            this.dataGridViewCheckBoxColumn1.ReadOnly = true;
-            this.dataGridViewCheckBoxColumn1.Width = 80;
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.dataGridViewTextBoxColumn1.HeaderText = "NAME";
-            this.dataGridViewTextBoxColumn1.MinimumWidth = 6;
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            // 
-            // dataGridViewTextBoxColumn2
-            // 
-            this.dataGridViewTextBoxColumn2.HeaderText = "NomeOriginal";
-            this.dataGridViewTextBoxColumn2.MinimumWidth = 6;
-            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-            this.dataGridViewTextBoxColumn2.Visible = false;
-            this.dataGridViewTextBoxColumn2.Width = 125;
             // 
             // tableLayoutPanel1
             // 
@@ -388,51 +400,42 @@
             this.splitContainer1.SplitterDistance = 393;
             this.splitContainer1.TabIndex = 18;
             // 
-            // btnMover
+            // LIstaIcones
             // 
-            this.btnMover.Location = new System.Drawing.Point(1093, 48);
-            this.btnMover.Name = "btnMover";
-            this.btnMover.Size = new System.Drawing.Size(142, 23);
-            this.btnMover.TabIndex = 17;
-            this.btnMover.Text = "Mover Selecionados";
-            this.btnMover.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.btnMover.UseVisualStyleBackColor = true;
-            this.btnMover.Visible = false;
+            this.LIstaIcones.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("LIstaIcones.ImageStream")));
+            this.LIstaIcones.TransparentColor = System.Drawing.Color.Transparent;
+            this.LIstaIcones.Images.SetKeyName(0, "Part.png");
+            this.LIstaIcones.Images.SetKeyName(1, "Assembly.png");
+            this.LIstaIcones.Images.SetKeyName(2, "DWG.png");
+            this.LIstaIcones.Images.SetKeyName(3, "IDW.png");
+            this.LIstaIcones.Images.SetKeyName(4, "IPN.png");
+            this.LIstaIcones.Images.SetKeyName(5, "Outros.png");
             // 
-            // txtFolderToMove
+            // normaBindingSource
             // 
-            this.txtFolderToMove.FormattingEnabled = true;
-            this.txtFolderToMove.Location = new System.Drawing.Point(800, 48);
-            this.txtFolderToMove.Name = "txtFolderToMove";
-            this.txtFolderToMove.Size = new System.Drawing.Size(287, 21);
-            this.txtFolderToMove.TabIndex = 19;
-            this.txtFolderToMove.Visible = false;
+            this.normaBindingSource.DataSource = typeof(Bosch_ImportData.Norma);
             // 
-            // cbLocation
+            // CheckAll
             // 
-            this.cbLocation.FormattingEnabled = true;
-            this.cbLocation.Items.AddRange(new object[] {
-            "$/ATMOLIB/Library/Catalog",
-            "$/ATMOLIB/Produtos Bosch",
-            "$/Sites/CtP_TEF/project",
-            "$/ContentCenter/en-US",
-            "$/ContentCenter/pt-BR",
-            "$/ContentCenter/pt-PT"});
-            this.cbLocation.Location = new System.Drawing.Point(543, 48);
-            this.cbLocation.Name = "cbLocation";
-            this.cbLocation.Size = new System.Drawing.Size(251, 21);
-            this.cbLocation.TabIndex = 20;
-            this.cbLocation.Visible = false;
-            this.cbLocation.SelectedIndexChanged += new System.EventHandler(this.cbLocation_SelectedIndexChanged);
+            this.CheckAll.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.CheckAll.Name = "CheckAll";
+            this.CheckAll.Size = new System.Drawing.Size(180, 23);
+            this.CheckAll.Text = "Check All";
+            this.CheckAll.Click += new System.EventHandler(this.CheckAll_Click);
+            // 
+            // UncheckAll
+            // 
+            this.UncheckAll.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.UncheckAll.Name = "UncheckAll";
+            this.UncheckAll.Size = new System.Drawing.Size(240, 23);
+            this.UncheckAll.Text = "Uncheck All";
+            this.UncheckAll.Click += new System.EventHandler(this.UncheckAll_Click);
             // 
             // ImportFiles
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1253, 808);
-            this.Controls.Add(this.cbLocation);
-            this.Controls.Add(this.txtFolderToMove);
-            this.Controls.Add(this.btnMover);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "ImportFiles";
@@ -441,17 +444,20 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ImportFiles_FormClosing);
             this.Load += new System.EventHandler(this.ImportFiles_Load);
             this.subMenu.ResumeLayout(false);
+            this.subMenu.PerformLayout();
             this.tabControl1.ResumeLayout(false);
+            this.tabDesconhecidos.ResumeLayout(false);
+            this.tabDesconhecidos.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TabelaDesconhecidos)).EndInit();
             this.tabTabela.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tabelaItens)).EndInit();
-            this.tabDesconhecidos.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.TabelaDesconhecidos)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.normaBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -461,32 +467,31 @@
         private System.Windows.Forms.Button btnSearchZip;
         private System.Windows.Forms.Button btnExtrair;
         private System.Windows.Forms.ContextMenuStrip subMenu;
-        private System.Windows.Forms.ToolStripMenuItem moverParaCCToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem moverParaATMOLIBToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem moverParaNormaToolStripMenuItem;
-        private System.Windows.Forms.ListView ListaLV;
-        private System.Windows.Forms.ColumnHeader DirectoryCol;
-        private System.Windows.Forms.ColumnHeader FileNameCol;
-        private System.Windows.Forms.ColumnHeader StatusCol;
         public System.Windows.Forms.TreeView TreeBosch;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabTabela;
         private System.Windows.Forms.TabPage tabDesconhecidos;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.DataGridViewComboBoxColumn ColunaTipo;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn VaultExistColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColunaName;
-        private System.Windows.Forms.DataGridViewButtonColumn ColunaFind;
-        private System.Windows.Forms.DataGridViewTextBoxColumn originalNameColumn;
         public System.Windows.Forms.DataGridView tabelaItens;
         public System.Windows.Forms.DataGridView TabelaDesconhecidos;
         private System.Windows.Forms.Button btnMover;
         private System.Windows.Forms.ComboBox txtFolderToMove;
+        private System.Windows.Forms.ComboBox cbLocation;
+        private System.Windows.Forms.BindingSource normaBindingSource;
+        public System.Windows.Forms.ImageList LIstaIcones;
+        private System.Windows.Forms.DataGridViewComboBoxColumn ColunaTipo;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn VaultExistColumn;
+        private System.Windows.Forms.DataGridViewImageColumn ColunaExtensaoArquivo;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColunaName;
+        private System.Windows.Forms.DataGridViewButtonColumn ColunaFind;
+        private System.Windows.Forms.DataGridViewTextBoxColumn originalNameColumn;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DataGridViewCheckBoxColumn ColunaCheck;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn1;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
-        private System.Windows.Forms.ComboBox cbLocation;
+        private System.Windows.Forms.ToolStripTextBox CheckAll;
+        private System.Windows.Forms.ToolStripTextBox UncheckAll;
     }
 }

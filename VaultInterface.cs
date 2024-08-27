@@ -23,7 +23,7 @@ namespace Bosch_ImportData
 {
     public class VaultInterface
     {
-     
+
         public void procurar()
         {
 
@@ -409,17 +409,26 @@ namespace Bosch_ImportData
         public static List<string> GetChildrenFoldersByFolderName(string FolderName)
         {
             List<string> ChildrenFolders = new List<string>();
-
-            Folder folder = FindFolderByName(FolderName);
-
-            Folder[] subpastas = VaultHelper.connection.WebServiceManager.DocumentService.GetFoldersByParentId(folder.Id, false);
-
-            foreach (Folder subpasta in subpastas)
+            try
             {
-                Log.gravarLog($"{subpasta.Id} - {subpasta.Name}");
-                ChildrenFolders.Add(subpasta.Name);
+
+                Folder folder = FindFolderByName(FolderName);
+
+                Folder[] subpastas = VaultHelper.connection.WebServiceManager.DocumentService.GetFoldersByParentId(folder.Id, false);
+
+                foreach (Folder subpasta in subpastas)
+                {
+                    Log.gravarLog($"{subpasta.Id} - {subpasta.Name}");
+                    ChildrenFolders.Add(subpasta.Name);
+                }
+                return ChildrenFolders;
+
             }
-            return ChildrenFolders;
+            catch (Exception)
+            {
+
+                return ChildrenFolders;
+            }
         }
 
         public static List<string> GetAllFolderNames()

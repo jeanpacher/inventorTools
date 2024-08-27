@@ -10,18 +10,28 @@ using System.Runtime.InteropServices;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
+using Config = Bosch_ImportData.Properties.Settings;
+using System.Reflection;
 
 namespace Bosch_ImportData
 {
     public enum ProductType
     {
         Norma,
-        ATMO,
         ATMOLIB_Library,
         ATMOLIB_ProdutosBosch,
         NormaAuxiliar,
         ContentCenter,
         Desconhecido
+    }
+
+    public enum FileType
+    {
+        Part,
+        Assembly,
+        IdwDrawing,
+        DwgDrawing,
+        Presentation
     }
     public class Norma
     {
@@ -33,15 +43,14 @@ namespace Bosch_ImportData
         {
             Produto produto = new Produto(filename, CodigoNorma, _isMissing);
             Produtos.Add(produto);
-
             return produto;
         }
     }
     public class Produto
     {
         public string temprootPath { get; set; } = Properties.Settings.Default.tempVaultRootPath;
-        public string projectPath { get; set; } = Properties.Settings.Default.ProjectRootPath;
         public TreeNode node;
+
         public string Filename { get; set; }
         public string NewFileName { get; set; }
         public string FileNameSimplificado { get; set; }
@@ -50,7 +59,8 @@ namespace Bosch_ImportData
         public bool isVaultExisting { get; set; }
         public bool isNeedMove { get; set; } = false;
         public string PathToMove { get; set; } = string.Empty;
-
+        public FileType TipoArquivo { get; set; }
+        public int image { get; set; }
         public Produto() { }
         public Produto(string _filename, string CodNorma, bool missing)
         {
@@ -59,39 +69,43 @@ namespace Bosch_ImportData
             FileInfo fileInfo = new FileInfo(Filename);
             string name = Path.GetFileNameWithoutExtension(Filename);
 
+
+            image = GetFileExtension(Filename);
+
+
             if (name.StartsWith(CodNorma))
             {
                 Type = ProductType.Norma;
-                NewFileName = Path.Combine(temprootPath, projectPath, CodNorma, fileInfo.Name);
+                NewFileName = Path.Combine(temprootPath, Config.Default.ProjectRootPath, CodNorma, fileInfo.Name);
             }
             else if (Filename.Contains("Content Center Files"))
             {
                 Type = ProductType.ContentCenter;
-                NewFileName = Path.Combine(temprootPath, Properties.Settings.Default.ContentCenterRootPath, ConvertFilePath(Filename, "Content Center Files"));
+                NewFileName = Path.Combine(temprootPath, Config.Default.ContentCenterRootPath, ConvertFilePath(Filename, "Content Center Files"));
             }
             else if (Filename.Contains("Catalog"))
             {
                 Type = ProductType.ATMOLIB_Library;
-                NewFileName = Path.Combine(temprootPath, Properties.Settings.Default.Catalog, ConvertFilePath(Filename, "Catalog"));
+                NewFileName = Path.Combine(temprootPath, Config.Default.Catalog, ConvertFilePath(Filename, "Catalog"));
             }
             else if (Filename.Contains("Produtos Bosch"))
             {
                 Type = ProductType.ATMOLIB_ProdutosBosch;
-                NewFileName = Path.Combine(temprootPath, Properties.Settings.Default.ProdutosBosch, ConvertFilePath(Filename, "Produtos Bosch"));
+                NewFileName = Path.Combine(temprootPath, Config.Default.ProdutosBosch, ConvertFilePath(Filename, "Produtos Bosch"));
             }
 
             else if (name.StartsWith("43") || name.StartsWith("45") || name.StartsWith("46") || name.StartsWith("47"))
             {
                 Type = ProductType.NormaAuxiliar;
-                NewFileName = Path.Combine(temprootPath, projectPath, fileInfo.Directory.Name, fileInfo.Name);
+                NewFileName = Path.Combine(temprootPath, Config.Default.ProjectRootPath, fileInfo.Directory.Name, fileInfo.Name);
             }
 
 
             else if (name.StartsWith(Directory.GetParent(Filename).Name))
             {
-                
+
                 Type = ProductType.ATMOLIB_Library;
-                NewFileName = Path.Combine(temprootPath, Properties.Settings.Default.Catalog, ConvertFilePath(Filename, "Produtos Bosch"));
+                NewFileName = Path.Combine(temprootPath, Config.Default.Catalog, ConvertFilePath(Filename, "Produtos Bosch"));
             }
             else
             {
@@ -106,6 +120,37 @@ namespace Bosch_ImportData
             FileNameSimplificado = NewFileName.Replace(temprootPath, @"$\");
         }
 
+        public int GetFileExtension(string filename)
+        {
+            switch (Path.GetExtension(filename))
+            {
+                case ".ipt":
+                    TipoArquivo = FileType.Part;
+                    return 0;
+
+
+                case ".iam":
+                    TipoArquivo = FileType.Assembly;
+                    return 1;
+
+                case ".idw":
+                    TipoArquivo = FileType.IdwDrawing;
+                    return 2;
+
+                case ".dwg":
+                    TipoArquivo = FileType.DwgDrawing;
+                    return 3;
+
+                case ".ipn":
+                    TipoArquivo = FileType.Presentation;
+                    return 4;
+
+                default:
+                    return 5;
+
+            }
+
+        }
         private bool IsProdutoBosch()
         {
             return true;
@@ -120,5 +165,17 @@ namespace Bosch_ImportData
         }
     }
 
+    public class ListaPastas
+    {
+        public List<Pasta> Pastas { get; set; } = new List<Pasta>();
+    }
+
+    public class Pasta
+    {
+        public string NomePasta { get; set; }
+        public string Caminho { get; set; }
+        public TreeNode node { get; set; }
+        public ProductType Tipo { get; set; }
+    }
 
 }
