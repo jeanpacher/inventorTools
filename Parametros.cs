@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Bosch_ImportData
 {
@@ -17,5 +18,9 @@ namespace Bosch_ImportData
         public static string JsonFilename { get; set; } = @"C:\KeepSoftwares\Bosch\Data.json";
         public static HashSet<string> pastas { get; set; } = new HashSet<string>();
         public static List<string> TreeViewPastas  { get; set; } = new List<string>();
-    }           
+        public static Dictionary<string, TreeNode> DicionarioNodes { get; set; } = new Dictionary<string, TreeNode>();
+        public static Dictionary<string, TreeNode> DicionarioNodesMissing { get; set; } = new Dictionary<string, TreeNode>();
+
+    }
+
 }

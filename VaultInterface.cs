@@ -10,6 +10,8 @@ using VDF = Autodesk.DataManagement.Client.Framework;
 using config = Bosch_ImportData.Properties.Settings;
 using File = Autodesk.Connectivity.WebServices.File;
 using Folder = Autodesk.Connectivity.WebServices.Folder;
+using Autodesk.DataManagement.Client.Framework.Vault.ExtensionMethods;
+using Autodesk.DataManagement.Client.Framework.Vault.Currency.Entities;
 
 //using Autodesk.Connectivity.WebServicesTools;
 //using Autodesk.DataManagement.Client.Framework.Vault.Currency.Entities;
@@ -318,7 +320,7 @@ namespace Bosch_ImportData
                 return null;
             }
         }
-        public static bool FindFileByName(string fileName)
+        public static File[] FindFileByName(string fileName)
         {
 
             //     PropDefId = The ID of the property definition to search on. This parameter is only used if
@@ -335,6 +337,7 @@ namespace Bosch_ImportData
                 SrchTxt = fileName
             };
 
+
             string bookmark = string.Empty;
             SrchStatus status;
             File[] files = VaultHelper.connection.WebServiceManager.DocumentService.FindFilesBySearchConditions(
@@ -347,10 +350,8 @@ namespace Bosch_ImportData
                 ref bookmark,
                 out status);
 
-            if (files == null)
-                return false;
-            else
-                return true;
+            return files;
+
         }
         public static Folder FindFolderByName(string folderName)
         {
@@ -430,7 +431,6 @@ namespace Bosch_ImportData
                 return ChildrenFolders;
             }
         }
-
         public static List<string> GetAllFolderNames()
         {
             List<string> folderNames = new List<string>();
@@ -455,6 +455,58 @@ namespace Bosch_ImportData
 
 
             return folderNames;
+        }
+
+        public static FileIteration DownloadFile(File file, string destination = null)
+        {
+            try
+            {
+                VDF.Vault.Currency.Entities.FileIteration fileItem = new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, file);
+                VDF.Vault.Settings.AcquireFilesSettings settings = new VDF.Vault.Settings.AcquireFilesSettings(VaultHelper.connection);
+
+                if (destination != null)
+                    settings.LocalPath = new VDF.Currency.FolderPathAbsolute(destination);
+
+                settings.AddEntityToAcquire(new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, fileItem));
+                VaultHelper.connection.FileManager.AcquireFiles(settings);
+
+                return fileItem;
+
+            }
+            catch (Exception e1)
+            {
+                Log.gravarLog("Erro no arquivo: " + file.Name + "\n" + e1.ToString());
+                MessageBox.Show("Erro no arquivo: " + file.Name + "\n" + e1.ToString());
+                return null;
+            }
+
+        }
+        public static void DownloadFiles(File[] files, string destination = null)
+        {
+
+            foreach (var file in files)
+            {
+                try
+                {
+                    if (file.Name.EndsWith(".dwf"))
+                        continue;
+
+                    VDF.Vault.Currency.Entities.FileIteration fileItem = new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, file);
+                    VDF.Vault.Settings.AcquireFilesSettings settings = new VDF.Vault.Settings.AcquireFilesSettings(VaultHelper.connection);
+                    settings.AddEntityToAcquire(new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, fileItem));
+
+
+                    if (destination != null)
+                        settings.LocalPath = new VDF.Currency.FolderPathAbsolute(destination);
+                    //VDF.Vault.Currency.Entities.Folder pasta = new VDF.Vault.Currency.Entities.Folder(connection, fileItem);
+                    VaultHelper.connection.FileManager.AcquireFiles(settings);
+                    //MessageBox.Show("Download concluido: " + Convert.ToString(settings.LocalPath));
+                }
+                catch (Exception e2)
+                {
+                    MessageBox.Show("Erro no arquivo: " + file.Name + "\n" + e2.ToString());
+                }
+            }
         }
 
     }

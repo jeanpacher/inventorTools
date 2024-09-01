@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using SharpCompress.Archives;
 using SharpCompress.Common;
@@ -17,7 +18,7 @@ namespace Bosch_ImportData
             tabela = _tabela;
             ImageList = _imageList;
         }
-        
+
         public Norma ExtractZip(string zipFilePath)
         {
             Norma norma = new Norma()
@@ -32,7 +33,7 @@ namespace Bosch_ImportData
                     if (!IsFileValidate(entry, norma))
                         continue;
 
-                    Produto prod  = norma.GetNewProduct(entry.Key, false);
+                    Produto prod = norma.GetNewProduct(entry.Key, false);
 
                     // Criar diretório pai, se não existir
                     string parentDirectory = Path.GetDirectoryName(prod.NewFileName);
@@ -89,15 +90,13 @@ namespace Bosch_ImportData
             string displayName = TableFormat.GetDisplayName(prod);
 
             int rowIndex = tabela.Rows.Add(
-                    prod.Type.ToString(),
-                    prod.isVaultExisting,
-                   ImageList.Images[prod.image],
-                    $"{Path.GetFileName(prod.NewFileName)}",
-                    "BOTAO EXTRA",
-                    prod.NewFileName);
-
-            if (prod.isMissing)
-                tabela.Rows[rowIndex].DefaultCellStyle.ForeColor = System.Drawing.Color.Red;
+                     prod.Type.ToString(),
+                       prod.isVaultExisting,
+                       ImageList.Images[prod.IconName],
+                       Path.GetDirectoryName(prod.NewFileName).Split('\\').Last(),
+                       Path.GetFileName(prod.NewFileName),
+                       "RENOMEAR",
+                       prod.NewFileName);
 
             tabela.Update();
             tabela.FirstDisplayedScrollingRowIndex = tabela.RowCount - 1;
