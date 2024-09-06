@@ -39,7 +39,7 @@
       <Value Profile="(Default)">Administrator</Value>
     </Setting>
     <Setting Name="VaultPassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1dugel.</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DefaultIPJ" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\KeepSoftwares\Bosch\StandardIPJ.ipj</Value>

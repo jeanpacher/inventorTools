@@ -1,6 +1,6 @@
 {
-  "Server": "eng01-srv",
-  "Database": "Idugel",
-  "Username": "Administrator",
-  "Password": "1dugel."
+  "Server": "https://CA0VM00168.BR.BOSCH.COM",
+  "Database": "vault_ct_tef",
+  "Username": "",
+  "Password": ""
 }

@@ -10,212 +10,17 @@ using VDF = Autodesk.DataManagement.Client.Framework;
 using config = Bosch_ImportData.Properties.Settings;
 using File = Autodesk.Connectivity.WebServices.File;
 using Folder = Autodesk.Connectivity.WebServices.Folder;
-using Autodesk.DataManagement.Client.Framework.Vault.ExtensionMethods;
 using Autodesk.DataManagement.Client.Framework.Vault.Currency.Entities;
+using Inventor;
+using VDF1 = Autodesk.DataManagement.Client.Framework.Vault;
+using System.IO;
 
-//using Autodesk.Connectivity.WebServicesTools;
-//using Autodesk.DataManagement.Client.Framework.Vault.Currency.Entities;
-//using Autodesk.DataManagement.Client.Framework.Vault.Currency.Connections;
-//using System.Web.Services.Description;
-//using static Autodesk.DataManagement.Client.Framework.Vault.Currency.Properties.PropertyDefinitionIds;
-//using System.Data.Common;
-//using System.Configuration;
+using Autodesk.Connectivity.Explorer.Extensibility;
+using Autodesk.DataManagement.Client.Framework.Vault.Currency.Properties;
+
 
 namespace Bosch_ImportData
 {
-    public class VaultInterface
-    {
-
-        public void procurar()
-        {
-
-            // PropDef property;
-            // property = PropertySearchType.AllProperties;
-            //create a SearchCondition object
-            SrchCond searchCondition = new SrchCond();
-            searchCondition.PropDefId = 1;
-            searchCondition.PropTyp = PropertySearchType.AllProperties;
-            searchCondition.SrchOper = 1;
-            searchCondition.SrchTxt = "000.30590.iam";
-            //build our array of SearchConditions to use for the file search
-            SrchCond[] conditions = new SrchCond[1];
-            conditions[0] = searchCondition;
-            string bookmark = string.Empty;
-            SrchStatus status = null;
-            Autodesk.Connectivity.WebServices.File[] files = VaultHelper.connection.WebServiceManager.DocumentService.FindFilesBySearchConditions(conditions, null, null, true, true, ref bookmark, out status);
-            VDF.Vault.Currency.Entities.FileIteration fileItem;
-            foreach (var file in files)
-            {
-                if (!file.Name.EndsWith(".iam"))
-                    continue;
-                fileItem = new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, file);
-                if (fileItem == null)
-                {
-                    MessageBox.Show("Caiu aqui");
-                    return;
-                }
-                Autodesk.Connectivity.WebServices.FileAssocArray[] associationArrays = VaultHelper.connection.WebServiceManager.DocumentService.GetFileAssociationsByIds(
-                     new long[] { fileItem.EntityIterationId },
-                    Autodesk.Connectivity.WebServices.FileAssociationTypeEnum.All, true,        // parent associations
-                    Autodesk.Connectivity.WebServices.FileAssociationTypeEnum.Dependency, true,   // child associations
-                    true, true);
-                Autodesk.Connectivity.WebServices.FileAssoc[] associations = associationArrays[0].FileAssocs;
-                Dictionary<long, List<VDF.Vault.Currency.Entities.FileIteration>> associationsByFile = new Dictionary<long, List<VDF.Vault.Currency.Entities.FileIteration>>();
-                foreach (Autodesk.Connectivity.WebServices.FileAssoc association in associations)
-                {
-                    Autodesk.Connectivity.WebServices.File parent = association.ParFile;
-                    if (associationsByFile.ContainsKey(parent.Id))
-                    {
-                        // parent is already in the hashtable, add an new child entry
-                        List<VDF.Vault.Currency.Entities.FileIteration> list = associationsByFile[parent.Id];
-                        list.Add(new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, association.CldFile));
-                        // MessageBox.Show(new VDF.Vault.Currency.Entities.FileIteration(connection, association.CldFile).EntityName);
-                    }
-                    else
-                    {
-                        // add the parent to the hashtable.
-                        List<VDF.Vault.Currency.Entities.FileIteration> list = new List<VDF.Vault.Currency.Entities.FileIteration>();
-                        list.Add(new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, association.CldFile));
-                        associationsByFile.Add(parent.Id, list);
-                        // MessageBox.Show(new VDF.Vault.Currency.Entities.FileIteration(connection, association.CldFile).EntityName);
-                    }
-                    VDF.Vault.Settings.AcquireFilesSettings settings = new VDF.Vault.Settings.AcquireFilesSettings(VaultHelper.connection);
-                    settings.AddEntityToAcquire(new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, association.CldFile));
-                    //settings.AddFileToAcquire();
-                    //string filePath = Path.Combine(Application.LocalUserAppDataPath, fileItem.EntityName);
-                    //string filePath = @"C:\Vault_Workfolder\2\";
-                    //settings.LocalPath = new VDF.Currency.FolderPathAbsolute(Path.GetDirectoryName(filePath));
-                    VaultHelper.connection.FileManager.AcquireFiles(settings);
-                }
-                break;
-            }
-        }
-        public void downloadFile(string arquivo)
-        {
-            //string filePath = @"C:\Vault_Workfolder\Vault_Selgron\temp\";
-            //Directory.CreateDirectory(filePath);
-            // For demonstration purposes, the information is hard-coded.
-            VDF.Vault.Results.LogInResult results = VDF.Vault.Library.ConnectionManager.LogIn(
-                "192.168.10.218", "Selgron_Vault", "Administrator", "selgron@2015", VDF.Vault.Currency.Connections.AuthenticationFlags.Standard, null
-                );
-            if (!results.Success)
-            {
-                MessageBox.Show("Erro na conexão");
-                return;
-            }
-            VaultHelper.connection = results.Connection;
-            //PropDef property;
-            //create a SearchCondition object
-            SrchCond searchCondition = new SrchCond();
-            searchCondition.PropDefId = 1;
-            searchCondition.PropTyp = PropertySearchType.AllProperties;
-            searchCondition.SrchOper = 1;
-            searchCondition.SrchTxt = arquivo;
-            //build our array of SearchConditions to use for the file search
-            SrchCond[] conditions = new SrchCond[1];
-            conditions[0] = searchCondition;
-            string bookmark = string.Empty;
-            SrchStatus status = null;
-            Autodesk.Connectivity.WebServices.File[] files = VaultHelper.connection.WebServiceManager.DocumentService.FindFilesBySearchConditions(conditions, null, null, true, true, ref bookmark, out status);
-            if (files == null)
-                return;
-            foreach (var file in files)
-            {
-                try
-                {
-                    if (!file.Name.EndsWith(".idw"))
-                        continue;
-                    VDF.Vault.Currency.Entities.FileIteration fileItem = new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, file);
-                    VDF.Vault.Settings.AcquireFilesSettings settings = new VDF.Vault.Settings.AcquireFilesSettings(VaultHelper.connection);
-                    settings.AddEntityToAcquire(new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, fileItem));
-                    //settings.LocalPath = new VDF.Currency.FolderPathAbsolute(Path.GetDirectoryName(filePath));
-                    //VDF.Vault.Currency.Entities.Folder pasta = new VDF.Vault.Currency.Entities.Folder(connection, fileItem);
-                    VaultHelper.connection.FileManager.AcquireFiles(settings);
-                    //MessageBox.Show("Download concluido: " + Convert.ToString(settings.LocalPath));
-                }
-                catch (Exception e2)
-                {
-                    MessageBox.Show("Erro no arquivo: " + file.Name + "\n" + e2.ToString());
-                }
-            }
-        }
-        public void downloadAllFiles(string arquivo)
-        {
-            //string filePath = @"C:\Vault_Workfolder\Vault_Selgron\temp\";
-            //Directory.CreateDirectory(filePath);
-            // For demonstration purposes, the information is hard-coded.
-            VDF.Vault.Results.LogInResult results = VDF.Vault.Library.ConnectionManager.LogIn(
-                "192.168.10.218", "Selgron_Vault", "Administrator", "selgron@2015", VDF.Vault.Currency.Connections.AuthenticationFlags.Standard, null
-                );
-            if (!results.Success)
-            {
-                MessageBox.Show("Erro na conexão");
-                return;
-            }
-            VaultHelper.connection = results.Connection;
-            //PropDef property;
-            //create a SearchCondition object
-            SrchCond searchCondition = new SrchCond();
-            searchCondition.PropDefId = 1;
-            searchCondition.PropTyp = PropertySearchType.AllProperties;
-            searchCondition.SrchOper = 1;
-            searchCondition.SrchTxt = arquivo;
-            //build our array of SearchConditions to use for the file search
-            SrchCond[] conditions = new SrchCond[1];
-            conditions[0] = searchCondition;
-            string bookmark = string.Empty;
-            SrchStatus status = null;
-            Autodesk.Connectivity.WebServices.File[] files = VaultHelper.connection.WebServiceManager.DocumentService.FindFilesBySearchConditions(conditions, null, null, true, true, ref bookmark, out status);
-            if (files == null) return;
-            foreach (var file in files)
-            {
-                if (!file.Name.EndsWith("idw"))
-                    continue;
-                // CRIANDO O FILEITEM
-                VDF.Vault.Currency.Entities.FileIteration fileItem = new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, file);
-                VDF.Vault.Settings.AcquireFilesSettings oSettings = new VDF.Vault.Settings.AcquireFilesSettings(VaultHelper.connection);
-                oSettings.AddEntityToAcquire(fileItem);
-                VaultHelper.connection.FileManager.AcquireFiles(oSettings);
-                //
-                Autodesk.Connectivity.WebServices.FileAssocArray[] associationArrays = VaultHelper.connection.WebServiceManager.DocumentService.GetFileAssociationsByIds(
-                     new long[] { fileItem.EntityIterationId },
-                    Autodesk.Connectivity.WebServices.FileAssociationTypeEnum.All, true,        // parent associations
-                    Autodesk.Connectivity.WebServices.FileAssociationTypeEnum.Dependency, true,   // child associations
-                    true, true);
-                Autodesk.Connectivity.WebServices.FileAssoc[] associations = associationArrays[0].FileAssocs;
-                Dictionary<long, List<VDF.Vault.Currency.Entities.FileIteration>> associationsByFile = new Dictionary<long, List<VDF.Vault.Currency.Entities.FileIteration>>();
-                foreach (Autodesk.Connectivity.WebServices.FileAssoc association in associations)
-                {
-                    Autodesk.Connectivity.WebServices.File parent = association.ParFile;
-                    if (associationsByFile.ContainsKey(parent.Id))
-                    {
-                        // parent is already in the hashtable, add an new child entry
-                        List<VDF.Vault.Currency.Entities.FileIteration> list = associationsByFile[parent.Id];
-                        list.Add(new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, association.CldFile));
-                        // MessageBox.Show(new VDF.Vault.Currency.Entities.FileIteration(connection, association.CldFile).EntityName);
-                    }
-                    else
-                    {
-                        // add the parent to the hashtable.
-                        List<VDF.Vault.Currency.Entities.FileIteration> list = new List<VDF.Vault.Currency.Entities.FileIteration>();
-                        list.Add(new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, association.CldFile));
-                        associationsByFile.Add(parent.Id, list);
-                        // MessageBox.Show(new VDF.Vault.Currency.Entities.FileIteration(connection, association.CldFile).EntityName);
-                    }
-                    VDF.Vault.Settings.AcquireFilesSettings settings = new VDF.Vault.Settings.AcquireFilesSettings(VaultHelper.connection);
-                    settings.AddEntityToAcquire(new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, association.CldFile));
-                    //
-                    //settings.AddFileToAcquire();
-                    //string filePath = Path.Combine(Application.LocalUserAppDataPath, fileItem.EntityName);
-                    //string filePath = @"C:\Vault_Workfolder\2\";
-                    //settings.LocalPath = new VDF.Currency.FolderPathAbsolute(Path.GetDirectoryName(filePath));
-                    VaultHelper.connection.FileManager.AcquireFiles(settings);
-
-                }
-                break;
-            }
-        }
-    }
     public class UserCredentials
     {
         public string Server { get; set; }
@@ -271,7 +76,7 @@ namespace Bosch_ImportData
 
                 VDF.Vault.Results.LogInResult results = VDF.Vault.Library.ConnectionManager.LogIn(
                     "eng01-srv",
-                    "Idugel",
+                    "IdugelTeste",
                     "Administrator",
                     "1dugel.", VDF.Vault.Currency.Connections.AuthenticationFlags.Standard, null
                     );
@@ -331,7 +136,7 @@ namespace Bosch_ImportData
 
             SrchCond searchCondition = new SrchCond
             {
-                PropDefId = 9, // ID da propriedade do nome do arquivo
+                PropDefId = 9 , // ID da propriedade do nome do arquivo
                 PropTyp = PropertySearchType.SingleProperty,
                 SrchOper = 3,  // Operador de pesquisa: "igual a"
                 SrchTxt = fileName
@@ -345,7 +150,7 @@ namespace Bosch_ImportData
                 new SrchCond[] { searchCondition },
                 null,
                 null,
-                false,
+                true,
                 true,
                 ref bookmark,
                 out status);
@@ -456,7 +261,6 @@ namespace Bosch_ImportData
 
             return folderNames;
         }
-
         public static FileIteration DownloadFile(File file, string destination = null)
         {
             try
@@ -469,9 +273,7 @@ namespace Bosch_ImportData
 
                 settings.AddEntityToAcquire(new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, fileItem));
                 VaultHelper.connection.FileManager.AcquireFiles(settings);
-
                 return fileItem;
-
             }
             catch (Exception e1)
             {
@@ -479,7 +281,6 @@ namespace Bosch_ImportData
                 MessageBox.Show("Erro no arquivo: " + file.Name + "\n" + e1.ToString());
                 return null;
             }
-
         }
         public static void DownloadFiles(File[] files, string destination = null)
         {
@@ -508,6 +309,59 @@ namespace Bosch_ImportData
                 }
             }
         }
+        public static List<string> GetFoldersByPath(string caminho)
+        {
+            caminho = caminho.Replace('\\', '/');
+
+            List<string> ListaPastas = new List<string>();
+            try
+            {
+                string[] paths = { caminho };
+                Folder pastaPai = VaultHelper.connection.WebServiceManager.DocumentService.FindFoldersByPaths(paths).First();
+                if (pastaPai.Id < 0) return ListaPastas;
+
+                Folder[] pastasFilho = VaultHelper.connection.WebServiceManager.DocumentService.GetFoldersByParentId(pastaPai.Id, false);
+                if (pastasFilho == null) return ListaPastas;
+
+                foreach (Folder pasta in pastasFilho)
+                {
+                    if (ListaPastas.Contains(pasta.Name)) continue;
+                    ListaPastas.Add(pasta.Name);
+                }
+
+                return ListaPastas;
+            }
+            catch (Exception e1)
+            {
+                MessageBox.Show(e1.ToString());
+                return ListaPastas;
+            }
+        }
+
+        public static void ListarPropDefIds()
+        {
+            try
+            {
+                // Obter o serviço de propriedades
+                PropertyService propService = connection.WebServiceManager.PropertyService;
+
+                // Buscar todas as propriedades
+                PropDef[] propriedades = propService.GetPropertyDefinitionsByEntityClassId("FILE");
+
+                // Exibir o ID e o nome de cada propriedade
+                foreach (PropDef propriedade in propriedades)
+                {
+                    System.Diagnostics.Debug.WriteLine($"PropDefId: {propriedade.Id}, Nome: {propriedade.DispName}");
+                    System.IO.File.AppendAllText(@"C:\KeepSoftwares\Bosch\Log\PropDefIdTable.txt", $"PropDefId: {propriedade.Id}, Nome: {propriedade.DispName}{System.Environment.NewLine}");
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao listar PropDefIds: " + ex.Message);
+            }
+        }
+
 
     }
 }

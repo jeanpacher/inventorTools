@@ -16,6 +16,7 @@ using System.Xml.Linq;
 using File = Autodesk.Connectivity.WebServices.File;
 using Autodesk.DataManagement.Client.Framework.Vault.Currency.Entities;
 using Folder = Autodesk.Connectivity.WebServices.Folder;
+using System.Drawing;
 
 //Autodesk.Connectivity.WebServices.File arquivo;
 
@@ -32,7 +33,6 @@ namespace Bosch_ImportData
         Vault,
         NaoEncontrado
     }
-
     public enum FileType
     {
         Part,
@@ -41,20 +41,18 @@ namespace Bosch_ImportData
         DwgDrawing,
         Presentation
     }
-
     public enum SourceFile
     {
         FromVault,
         FromClient,
         IsMissing,
     }
+
     public class Norma
     {
-
         public string CodigoNorma { get; set; }
         public List<Produto> Produtos = new List<Produto>();
         public AssemblyDocument oAsmDoc { get; set; }
-
         public Produto GetNewProduct(string filename, bool _isMissing)
         {
             Produto produto = new Produto(filename, CodigoNorma, _isMissing);
@@ -64,21 +62,21 @@ namespace Bosch_ImportData
     }
     public class Produto
     {
-
-        public TreeNode node;
-
         public string Filename { get; set; }
         public string NewFileName { get; set; }
         public string FileNameSimplificado { get; set; }
         public string OldFileName { get; set; } = string.Empty;
         public bool isMissing { get; set; }
         public bool isVaultExisting { get; set; }
-        public bool isNeedMove { get; set; } = false;
-        public SourceFile origem { get; set; }
+        public bool isAssemblyParticipant { get; set; } = false;
+        public string IconName { get; set; }
+        public SourceFile Origem { get; set; }
         public ProductType Type { get; set; }
         public FileType TipoArquivo { get; set; }
-        public string IconName { get; set; }
+        public Document Doc { get; set; }
+        public Image Thumbnail { get; set; }
         public Propriedades propriedades { get; set; } = null;
+        public TreeNode node { get; set; }
 
         public Produto() { }
         public Produto(string _filename, string CodNorma, bool missing)
@@ -86,7 +84,7 @@ namespace Bosch_ImportData
             isMissing = missing;
             Filename = _filename;
             string name = Path.GetFileNameWithoutExtension(Filename);
-            
+
 
             // DEFININDO O ICONE DO INVENTOR (PEÇA, MONTAGEM, DETALHAMENTO, ETC)
             string[] imagensNames = { ".ipt", ".iam", ".dwg", ".idw", ".ipn", "outros" };
@@ -102,7 +100,7 @@ namespace Bosch_ImportData
 
             if (VaultHelper.connection != null)
             {
-                files = VaultHelper.FindFileByName(Path.GetFileName(NewFileName));
+                files = VaultHelper.FindFileByName(Path.GetFileName(Filename));
                 if (files == null)
                     isVaultExisting = false;
                 else
@@ -116,19 +114,19 @@ namespace Bosch_ImportData
                 if (isVaultExisting)
                 {
                     isMissing = false;
-                    origem = SourceFile.FromVault;
+                    Origem = SourceFile.FromVault;
                     SetVaultProduct(files);
                 }
                 else
                 {
-                    origem = SourceFile.IsMissing;
+                    Origem = SourceFile.IsMissing;
                     DefineTypeName(Filename, CodNorma);
                     FileNameSimplificado = FileNameSimplificado.Replace('$', '@');
                 }
             }
             else
             {
-                origem = SourceFile.FromClient;
+                Origem = SourceFile.FromClient;
                 DefineTypeName(Filename, CodNorma);
             }
         }
@@ -139,18 +137,14 @@ namespace Bosch_ImportData
             Folder folder = VaultHelper.connection.WebServiceManager.DocumentService.GetFolderById(file.FolderId);
             FileNameSimplificado = Path.Combine(folder.FullName, file.Name);
             NewFileName = Path.Combine(Config.Default.tempVaultRootPath, FileNameSimplificado.Substring(2));
-            origem = SourceFile.FromVault;
+            Origem = SourceFile.FromVault;
             Type = ProductType.Vault;
+            VaultHelper.DownloadFile(file);
             VaultHelper.DownloadFile(file, Path.GetDirectoryName(NewFileName));
 
         }
 
 
-        //    else if (Filename.Contains("Content Center Files"))
-        //    {
-        //        Type = ProductType.ContentCenter;
-        //        NewFileName = Path.Combine(temprootPath, Config.Default.ContentCenterRootPath, ConvertFilePath(Filename, "Content Center Files"));
-        //    }
 
         //    else if (name.StartsWith(Directory.GetParent(Filename).Name))
         //    {
@@ -175,6 +169,9 @@ namespace Bosch_ImportData
             filenameOriginal = filenameOriginal.Replace("/", "\\");
             string[] parts = filenameOriginal.Split('\\');
             string name = parts.Last();
+            string partial_name = name.Substring(0, codigo.Length);
+
+
 
             if (parts.Length > 2)
             {
@@ -189,7 +186,8 @@ namespace Bosch_ImportData
                     return;
                 }
             }
-            if (name.StartsWith(codigo))
+            //if (name.StartsWith(codigo))
+            if (partial_name == codigo)
             {
                 Type = ProductType.Norma;
                 FileNameSimplificado = Path.Combine("$", Config.Default.ProjectRootPath, codigo, name);
@@ -217,6 +215,18 @@ namespace Bosch_ImportData
                 FileNameSimplificado = Path.Combine("$", Config.Default.ProjectRootPath, parts[parts.Length - 2], name);
                 NewFileName = Path.Combine(Config.Default.tempVaultRootPath, Config.Default.ProjectRootPath, parts[parts.Length - 2], name);
             }
+            else if (filenameOriginal.Contains("Content Center Files"))
+            {
+                Type = ProductType.ContentCenter;
+                string pasta = name.Split('-').First().TrimEnd(' ');
+                FileNameSimplificado = Path.Combine("$", Config.Default.ContentCenterRootPath, "en-US", pasta, name);
+                NewFileName = Path.Combine(Config.Default.tempVaultRootPath, FileNameSimplificado.Substring(2));
+            }
+
+            //    {
+            //        Type = ProductType.ContentCenter;
+            //        NewFileName = Path.Combine(temprootPath, Config.Default.ContentCenterRootPath, ConvertFilePath(Filename, "Content Center Files"));
+            //    })
             else
             {
                 Type = ProductType.Desconhecido;
@@ -224,7 +234,6 @@ namespace Bosch_ImportData
                 NewFileName = Path.Combine(Config.Default.tempVaultRootPath, "DESCONHECIDO", name);
             }
         }
-
         public int GetFileExtension(string filename)
         {
             switch (Path.GetExtension(filename))
@@ -255,10 +264,12 @@ namespace Bosch_ImportData
         public string RBGBDETAILS { get; set; }
         public string RBGBPRODUCERNAME { get; set; }
         public string RBGBPRODUCERORDERNO { get; set; }
+        public Document Doc { get; set; }
 
         public Propriedades(Document document)
         {
-            PropertySet customProps = document.PropertySets["Inventor User Defined Properties"];
+            Doc = document;
+            PropertySet customProps = Doc.PropertySets["Inventor User Defined Properties"];
 
             RBGBDETAILS = CheckOrCreateProperty(customProps, "RBGBDETAILS");
             RBGBPRODUCERNAME = CheckOrCreateProperty(customProps, "RBGBPRODUCERNAME");
@@ -270,32 +281,66 @@ namespace Bosch_ImportData
         {
             try
             {
-                foreach (Property prop in customProps)
-                {
-                    if (prop.Name == nomePropriedade)
-                    {
-                        return prop.Value.ToString();
-                    }
-                }
-                Property newProp = customProps.Add("", nomePropriedade);
+                return customProps[nomePropriedade].Value;
+            }
+            catch (Exception)
+            {
+                return createProperty(customProps, nomePropriedade);
+            }
+            #region old
+            //try
+            //{
+            //    foreach (Property prop in customProps)
+            //    {
+            //        if (prop.Name == nomePropriedade)
+            //        {
+            //            return prop.Value.ToString();
+            //        }
+            //    }
+            //    Property newProp = customProps.Add("", nomePropriedade);
+            //    return "";
+            //}
+            //catch (Exception ex)
+            //{
+            //    return $"Erro ao verificar ou criar a propriedade: {ex.Message}";
+            //} 
+            #endregion
+        }
+        public string createProperty(PropertySet customprops, string nomePropriedade)
+        {
+            try
+            {
+                customprops.Add("", nomePropriedade);
                 return "";
             }
             catch (Exception ex)
             {
-                return $"Erro ao verificar ou criar a propriedade: {ex.Message}";
+                 return $"Erro ao verificar ou criar a propriedade: {ex.Message}";
             }
         }
-
-        public bool ChangePropertyValue(PropertySet customProps, string NomePropriedade, string valorPropriedade)
+        public bool ChangePropertyValue(Produto prod, string NomePropriedade, string valorPropriedade)
         {
+            Document doc = Parametros._invApp.Documents.Open(prod.NewFileName, false);
+            PropertySet customProps = doc.PropertySets["Inventor User Defined Properties"];
+
             try
             {
                 customProps[NomePropriedade].Value = valorPropriedade;
+                //foreach (Property prop in customProps)
+                //{
+                //    if (prop.Name == NomePropriedade)
+                //    {
+                //        prop.Value = valorPropriedade;
+                //        return true;
+                //    }
+                //}
+                //Property newProp = customProps.Add(valorPropriedade, NomePropriedade);
                 return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao gerar a propriedade\n" + ex.ToString());
+                customProps.Add(valorPropriedade, NomePropriedade);
+                MessageBox.Show(ex.Message);
                 return false;
             }
         }

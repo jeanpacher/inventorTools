@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{627F6760-741D-4594-8378-DB2A59F83514}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>Bosch_ImportData</RootNamespace>
     <AssemblyName>Bosch_ImportData</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -55,9 +55,7 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>Bosch_ImportData.X.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="Autodesk.Connectivity.Explorer.Extensibility">
       <HintPath>..\..\..\..\..\Program Files\Autodesk\Autodesk Vault 2023 SDK\bin\x64\Autodesk.Connectivity.Explorer.Extensibility.dll</HintPath>
@@ -150,7 +148,9 @@
     <Compile Include="ImportFiles.Designer.cs">
       <DependentUpon>ImportFiles.cs</DependentUpon>
     </Compile>
+    <Compile Include="InventorThumbnail.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="PictureConvert.cs" />
     <Compile Include="PluginServer.cs" />
     <Compile Include="Produto.cs" />
     <Compile Include="Program.cs" />
@@ -177,7 +177,6 @@
     </AdditionalFiles>
     <None Include="Bosch_ImportData.X.manifest" />
     <None Include="packages.config" />
-    <None Include="Properties\DataSources\Norma.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -223,6 +222,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Icons\Botao Importar arquivos 64x64.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\DataSources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

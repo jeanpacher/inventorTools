@@ -1,18 +1,17 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using SharpCompress.Archives;
 using SharpCompress.Common;
-//using Config = Bosch_ImportData.Properties.Settings;
+
 
 
 namespace Bosch_ImportData
 {
     public class ZipfileManipulate
     {
-        private DataGridView tabela;
-        public ImageList ImageList;
+        private DataGridView tabela { get; set; }
+        public ImageList ImageList { get; set; }
         public ZipfileManipulate(DataGridView _tabela, ImageList _imageList)
         {
             tabela = _tabela;
@@ -32,22 +31,17 @@ namespace Bosch_ImportData
                 {
                     if (!IsFileValidate(entry, norma))
                         continue;
-
                     Produto prod = norma.GetNewProduct(entry.Key, false);
-
                     // Criar diretório pai, se não existir
                     string parentDirectory = Path.GetDirectoryName(prod.NewFileName);
                     if (!Directory.Exists(parentDirectory) && !string.IsNullOrEmpty(parentDirectory))
                     {
                         Directory.CreateDirectory(parentDirectory);
                     }
-
                     entry.WriteToFile(prod.NewFileName, new ExtractionOptions()
                     {
                         Overwrite = true,
-
                     });
-
                     CreateFirstTable(prod);
                 }
             }
@@ -96,6 +90,7 @@ namespace Bosch_ImportData
                        Path.GetDirectoryName(prod.NewFileName).Split('\\').Last(),
                        Path.GetFileName(prod.NewFileName),
                        "RENOMEAR",
+                       prod.isAssemblyParticipant,
                        prod.NewFileName);
 
             tabela.Update();

@@ -46,6 +46,7 @@
             this.ColunaPasta = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColunaName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColunaRenomear = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.colunaInventorParticipante = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.originalNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabDesconhecidos = new System.Windows.Forms.TabPage();
             this.label3 = new System.Windows.Forms.Label();
@@ -88,29 +89,32 @@
             // 
             // label1
             // 
-            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.Location = new System.Drawing.Point(3, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(215, 30);
+            this.label1.Size = new System.Drawing.Size(130, 30);
             this.label1.TabIndex = 5;
             this.label1.Text = "Arquivo a ser importado";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // txtZipFileName
             // 
             this.txtZipFileName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtZipFileName.Location = new System.Drawing.Point(224, 3);
+            this.txtZipFileName.Location = new System.Drawing.Point(139, 3);
             this.txtZipFileName.Name = "txtZipFileName";
-            this.txtZipFileName.Size = new System.Drawing.Size(1203, 20);
+            this.txtZipFileName.Size = new System.Drawing.Size(1088, 20);
             this.txtZipFileName.TabIndex = 4;
             this.txtZipFileName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // btnSearchZip
             // 
             this.btnSearchZip.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnSearchZip.Location = new System.Drawing.Point(1433, 3);
+            this.btnSearchZip.Location = new System.Drawing.Point(1233, 3);
             this.btnSearchZip.Name = "btnSearchZip";
-            this.btnSearchZip.Size = new System.Drawing.Size(35, 24);
+            this.btnSearchZip.Size = new System.Drawing.Size(38, 24);
             this.btnSearchZip.TabIndex = 3;
             this.btnSearchZip.Text = "...";
             this.btnSearchZip.UseVisualStyleBackColor = true;
@@ -120,9 +124,9 @@
             // 
             this.btnExtrair.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnExtrair.Location = new System.Drawing.Point(1474, 3);
+            this.btnExtrair.Location = new System.Drawing.Point(1277, 3);
             this.btnExtrair.Name = "btnExtrair";
-            this.btnExtrair.Size = new System.Drawing.Size(112, 24);
+            this.btnExtrair.Size = new System.Drawing.Size(113, 24);
             this.btnExtrair.TabIndex = 7;
             this.btnExtrair.Text = "Extrair";
             this.btnExtrair.UseVisualStyleBackColor = true;
@@ -165,7 +169,7 @@
             treeNode1.Text = "$";
             this.TreeBosch.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1});
-            this.TreeBosch.Size = new System.Drawing.Size(314, 725);
+            this.TreeBosch.Size = new System.Drawing.Size(275, 725);
             this.TreeBosch.TabIndex = 14;
             this.TreeBosch.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewNorma_AfterSelect);
             // 
@@ -178,7 +182,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1384, 725);
+            this.tabControl1.Size = new System.Drawing.Size(1214, 725);
             this.tabControl1.TabIndex = 16;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -188,7 +192,7 @@
             this.tabTabela.Location = new System.Drawing.Point(4, 22);
             this.tabTabela.Name = "tabTabela";
             this.tabTabela.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTabela.Size = new System.Drawing.Size(1376, 699);
+            this.tabTabela.Size = new System.Drawing.Size(1206, 699);
             this.tabTabela.TabIndex = 0;
             this.tabTabela.Text = "TABELA";
             this.tabTabela.UseVisualStyleBackColor = true;
@@ -206,6 +210,7 @@
             this.ColunaPasta,
             this.ColunaName,
             this.ColunaRenomear,
+            this.colunaInventorParticipante,
             this.originalNameColumn});
             this.tabelaItens.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabelaItens.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
@@ -214,7 +219,7 @@
             this.tabelaItens.RowHeadersWidth = 51;
             this.tabelaItens.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.tabelaItens.ShowEditingIcon = false;
-            this.tabelaItens.Size = new System.Drawing.Size(1370, 693);
+            this.tabelaItens.Size = new System.Drawing.Size(1200, 693);
             this.tabelaItens.StandardTab = true;
             this.tabelaItens.TabIndex = 0;
             this.tabelaItens.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.tabelaItens_CellClick);
@@ -228,26 +233,29 @@
             this.ColunaTipo.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.Nothing;
             this.ColunaTipo.HeaderText = "CATEGORIA";
             this.ColunaTipo.Items.AddRange(new object[] {
-            "Norma",
             "ATMOLIB_Library",
             "ATMOLIB_ProdutosBosch",
-            "NormaAuxiliar",
             "ContentCenter",
-            "Desconhecido"});
+            "Desconhecido",
+            "Norma",
+            "NormaAuxiliar"});
             this.ColunaTipo.MinimumWidth = 6;
             this.ColunaTipo.Name = "ColunaTipo";
             this.ColunaTipo.ReadOnly = true;
+            this.ColunaTipo.Sorted = true;
             this.ColunaTipo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.ColunaTipo.Width = 150;
             // 
             // VaultExistColumn
             // 
+            this.VaultExistColumn.FalseValue = "0";
             this.VaultExistColumn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.VaultExistColumn.HeaderText = "VAULT";
             this.VaultExistColumn.MinimumWidth = 6;
             this.VaultExistColumn.Name = "VaultExistColumn";
             this.VaultExistColumn.ReadOnly = true;
             this.VaultExistColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.VaultExistColumn.TrueValue = "1";
             this.VaultExistColumn.Width = 60;
             // 
             // ColunaExtensaoArquivo
@@ -279,6 +287,16 @@
             this.ColunaRenomear.Text = "Renomear";
             this.ColunaRenomear.Width = 125;
             // 
+            // colunaInventorParticipante
+            // 
+            this.colunaInventorParticipante.FalseValue = "0";
+            this.colunaInventorParticipante.HeaderText = "Inventor";
+            this.colunaInventorParticipante.Name = "colunaInventorParticipante";
+            this.colunaInventorParticipante.ReadOnly = true;
+            this.colunaInventorParticipante.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.colunaInventorParticipante.TrueValue = "1";
+            this.colunaInventorParticipante.Width = 70;
+            // 
             // originalNameColumn
             // 
             this.originalNameColumn.HeaderText = "NomeOriginal";
@@ -298,7 +316,7 @@
             this.tabDesconhecidos.Location = new System.Drawing.Point(4, 22);
             this.tabDesconhecidos.Name = "tabDesconhecidos";
             this.tabDesconhecidos.Padding = new System.Windows.Forms.Padding(3);
-            this.tabDesconhecidos.Size = new System.Drawing.Size(1376, 699);
+            this.tabDesconhecidos.Size = new System.Drawing.Size(1206, 699);
             this.tabDesconhecidos.TabIndex = 1;
             this.tabDesconhecidos.Text = "DESCONHECIDOS";
             this.tabDesconhecidos.UseVisualStyleBackColor = true;
@@ -339,7 +357,7 @@
             this.TabelaDesconhecidos.RowHeadersWidth = 51;
             this.TabelaDesconhecidos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.TabelaDesconhecidos.ShowEditingIcon = false;
-            this.TabelaDesconhecidos.Size = new System.Drawing.Size(1370, 625);
+            this.TabelaDesconhecidos.Size = new System.Drawing.Size(1200, 625);
             this.TabelaDesconhecidos.StandardTab = true;
             this.TabelaDesconhecidos.TabIndex = 16;
             // 
@@ -408,7 +426,7 @@
             this.tabATMOLIB.Location = new System.Drawing.Point(4, 22);
             this.tabATMOLIB.Name = "tabATMOLIB";
             this.tabATMOLIB.Padding = new System.Windows.Forms.Padding(3);
-            this.tabATMOLIB.Size = new System.Drawing.Size(1376, 699);
+            this.tabATMOLIB.Size = new System.Drawing.Size(1206, 699);
             this.tabATMOLIB.TabIndex = 2;
             this.tabATMOLIB.Text = "ATMOLIB";
             this.tabATMOLIB.UseVisualStyleBackColor = true;
@@ -430,9 +448,10 @@
             this.tabelaATMOLIB.Location = new System.Drawing.Point(3, 3);
             this.tabelaATMOLIB.Name = "tabelaATMOLIB";
             this.tabelaATMOLIB.RowHeadersWidth = 51;
-            this.tabelaATMOLIB.Size = new System.Drawing.Size(1370, 693);
+            this.tabelaATMOLIB.Size = new System.Drawing.Size(1200, 693);
             this.tabelaATMOLIB.StandardTab = true;
             this.tabelaATMOLIB.TabIndex = 1;
+            this.tabelaATMOLIB.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.tabelaATMOLIB_CellValueChanged);
             // 
             // ColunaIsVault
             // 
@@ -472,44 +491,43 @@
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.ColumnCount = 5;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 221F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 136F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 41F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 118F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 44F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 119F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 106F));
-            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.txtZipFileName, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.btnSearchZip, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.btnExtrair, 3, 0);
             this.tableLayoutPanel1.Controls.Add(this.button1, 4, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(24, 12);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1695, 30);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1499, 30);
             this.tableLayoutPanel1.TabIndex = 17;
             // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(1592, 3);
+            this.button1.Location = new System.Drawing.Point(1396, 3);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(100, 24);
             this.button1.TabIndex = 8;
             this.button1.Text = " CHECK IN";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // splitContainer1
             // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.Location = new System.Drawing.Point(24, 64);
+            this.splitContainer1.Location = new System.Drawing.Point(24, 69);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -519,8 +537,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
-            this.splitContainer1.Size = new System.Drawing.Size(1702, 725);
-            this.splitContainer1.SplitterDistance = 314;
+            this.splitContainer1.Size = new System.Drawing.Size(1493, 725);
+            this.splitContainer1.SplitterDistance = 275;
             this.splitContainer1.TabIndex = 18;
             // 
             // LIstaIcones
@@ -542,7 +560,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1744, 808);
+            this.ClientSize = new System.Drawing.Size(1535, 813);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -611,6 +629,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ColunaPasta;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColunaName;
         private System.Windows.Forms.DataGridViewButtonColumn ColunaRenomear;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn colunaInventorParticipante;
         private System.Windows.Forms.DataGridViewTextBoxColumn originalNameColumn;
     }
 }

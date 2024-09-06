@@ -106,6 +106,6 @@ C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.csproj.Gen
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.csproj.CoreCompileInputs.cache
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_Im.1466DB78.Up2Date
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.pdb
-C:\KeepSoftwares\Bosch\Bosch_ImportData.exe.config
-C:\KeepSoftwares\Bosch\Bosch_ImportData.exe
-C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.exe
+C:\KeepSoftwares\Bosch\Bosch_ImportData.dll.config
+C:\KeepSoftwares\Bosch\Bosch_ImportData.dll
+C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.dll
