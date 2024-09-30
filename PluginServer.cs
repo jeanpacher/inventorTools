@@ -140,7 +140,7 @@ namespace Bosch_ImportData
         void CarregarUI_ImportData(NameValueMap Content)
         {
             ImportFiles ImportData = new ImportFiles();
-            ShowFormControl.ShowModelessForm(ImportData);
+            ShowFormControl.ShowModalForm(ImportData);
         }
 
         //public void m_ApplicationEvents_OnOpenDocument(_Document DocumentObject, string FullDocumentName, EventTimingEnum BeforeOrAfter, NameValueMap Context, out HandlingCodeEnum HandlingCode)

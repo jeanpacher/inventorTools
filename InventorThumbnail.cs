@@ -12,7 +12,7 @@ namespace Bosch_ImportData
     public static class InventorThumbnail
     {
 
-        private static Image GetThumbnail(Document activeDoc)
+        public static Image GetThumbnail(Document activeDoc)
         {
             if (activeDoc == null)
             {

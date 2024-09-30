@@ -1,0 +1,49 @@
+{
+  "ProductInfo": [
+    {
+      "ReferenceString": "Catalog",
+      "Norma": "LIBRARY",
+      "RelativePath": "ATMOLIB\\Library\\Catalog"
+    },
+    {
+      "ReferenceString": "Produtos Bosch",
+      "Norma": "PRODUTOS_BOSCH",
+      "RelativePath": "ATMOLIB\\Produtos Bosch"
+    },
+    {
+      "ReferenceString": "en-US",
+      "Norma": "CONTENTCENTER",
+      "RelativePath": "ContentCenter\\en-US"
+    },
+    {
+      "ReferenceString": "pt-BR",
+      "Norma": "CONTENTCENTER",
+      "RelativePath": "ContentCenter\\pt-BR"
+    },
+    {
+      "ReferenceString": "pt-PT",
+      "Norma": "CONTENTCENTER",
+      "RelativePath": "ContentCenter\\pt-PT"
+    },
+    {
+      "ReferenceString": "Norma",
+      "Norma": "NORMA",
+      "RelativePath": "Sites\\CtP_TEF\\project"
+    },
+    {
+      "ReferenceString": "NormaAuxiliar",
+      "Norma": "NORMA_AUXILIAR",
+      "RelativePath": "Sites\\CtP_TEF\\project"
+    },
+    {
+      "ReferenceString": "NormaAuxiliar",
+      "Norma": "DESCONHECIDO",
+      "RelativePath": "Desconhecido"
+    },
+    {
+      "ReferenceString": "true",
+      "Norma": "NAOENCONTRADO",
+      "RelativePath": "NF"
+    }
+  ]
+}

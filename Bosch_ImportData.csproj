@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{627F6760-741D-4594-8378-DB2A59F83514}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>Bosch_ImportData</RootNamespace>
     <AssemblyName>Bosch_ImportData</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -33,12 +33,16 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\KeepSoftwares\Bosch\</OutputPath>
+    <OutputPath>..\..\..\..\..\KeepCAD\ImportacaoArquivos\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>5</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <RegisterForComInterop>false</RegisterForComInterop>
+    <DocumentationFile>
+    </DocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -142,6 +146,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Form_Imagem.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_Imagem.Designer.cs">
+      <DependentUpon>Form_Imagem.cs</DependentUpon>
+    </Compile>
     <Compile Include="ImportFiles.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -152,30 +162,44 @@
     <Compile Include="Log.cs" />
     <Compile Include="PictureConvert.cs" />
     <Compile Include="PluginServer.cs" />
-    <Compile Include="Produto.cs" />
+    <Compile Include="Produto2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TreeViewBosch.cs" />
+    <Compile Include="SplashScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SplashScreen.Designer.cs">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TreeViewHelper.cs" />
     <Compile Include="Parametros.cs" />
     <Compile Include="VaultInterface.cs" />
-    <Compile Include="ZipfileManipulate.cs" />
+    <Compile Include="FileManipulateHelper.cs" />
+    <EmbeddedResource Include="Form_Imagem.resx">
+      <DependentUpon>Form_Imagem.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ImportFiles.resx">
       <DependentUpon>ImportFiles.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <AdditionalFiles Include="Data.json">
+    <AdditionalFiles Include="Json\Data.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </AdditionalFiles>
     <None Include="Bosch_ImportData.X.manifest" />
+    <AdditionalFiles Include="Json\ProductInformation.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -224,7 +248,79 @@
     <None Include="Icons\Botao Importar arquivos 64x64.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Edita.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Lixeira.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Lupa.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Mover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MoverCompartilhar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Relatorio.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Rename.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="Properties\DataSources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\deletar.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\editar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\mover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\preview.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\procurar2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\Assembly.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\DWG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\IDW.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\IPN.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\Outros.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\Part.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\.idw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\.ipn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\.ipt.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\.iam.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\.dwg.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -13,7 +13,7 @@ using Folder = Autodesk.Connectivity.WebServices.Folder;
 using Autodesk.DataManagement.Client.Framework.Vault.Currency.Entities;
 using Inventor;
 using VDF1 = Autodesk.DataManagement.Client.Framework.Vault;
-using System.IO;
+
 
 using Autodesk.Connectivity.Explorer.Extensibility;
 using Autodesk.DataManagement.Client.Framework.Vault.Currency.Properties;
@@ -40,7 +40,7 @@ namespace Bosch_ImportData
         {
             try
             {
-                string filePath = Parametros.JsonFilename;
+                string filePath = Parametros.JsonVaultUserData;
                 UserCredentials credentials = new UserCredentials();
                 credentials = ReadUserCredentials(filePath);
 
@@ -58,14 +58,14 @@ namespace Bosch_ImportData
                 connection = results.Connection;
 
                 Autodesk.Connectivity.WebServices.Folder rootFolder = connection.WebServiceManager.DocumentService.GetFolderRoot();
-                config.Default.VaultRootPath = connection.WorkingFoldersManager.GetWorkingFolder(rootFolder.FullName).FullPath;
+                //config.Default.VaultRootPath = connection.WorkingFoldersManager.GetWorkingFolder(rootFolder.FullName).FullPath;
                 return true;
 
             }
             catch (Exception e1)
             {
                 Log.gravarLog(e1.ToString());
-                MessageBox.Show("Erro ao conectar ao Vault \nErro: " + e1.Message);
+                MessageBox.Show("Erro ao conectar ao VAULT \nErro: " + e1.Message);
                 return false;
             }
         }
@@ -87,14 +87,13 @@ namespace Bosch_ImportData
                 connection = results.Connection;
 
                 Autodesk.Connectivity.WebServices.Folder rootFolder = connection.WebServiceManager.DocumentService.GetFolderRoot();
-                config.Default.VaultRootPath = connection.WorkingFoldersManager.GetWorkingFolder(rootFolder.FullName).FullPath;
                 return true;
 
             }
             catch (Exception e1)
             {
                 Log.gravarLog(e1.ToString());
-                MessageBox.Show("Erro ao conectar ao Vault \nErro: " + e1.Message);
+                MessageBox.Show("Erro ao conectar ao VAULT \nErro: " + e1.Message);
                 return false;
             }
 
@@ -299,7 +298,7 @@ namespace Bosch_ImportData
 
                     if (destination != null)
                         settings.LocalPath = new VDF.Currency.FolderPathAbsolute(destination);
-                    //VDF.Vault.Currency.Entities.Folder pasta = new VDF.Vault.Currency.Entities.Folder(connection, fileItem);
+                    //VDF.VAULT.Currency.Entities.Folder pasta = new VDF.VAULT.Currency.Entities.Folder(connection, fileItem);
                     VaultHelper.connection.FileManager.AcquireFiles(settings);
                     //MessageBox.Show("Download concluido: " + Convert.ToString(settings.LocalPath));
                 }

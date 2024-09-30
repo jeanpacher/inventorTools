@@ -37,18 +37,6 @@ namespace Bosch_ImportData.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\VaultWorkFolderBosch\\")]
-        public string VaultRootPath {
-            get {
-                return ((string)(this["VaultRootPath"]));
-            }
-            set {
-                this["VaultRootPath"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Sites\\CtP_TEF\\project\\")]
         public string ProjectRootPath {
             get {
@@ -133,7 +121,7 @@ namespace Bosch_ImportData.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Idugel")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string VaultDB {
             get {
                 return ((string)(this["VaultDB"]));
@@ -145,7 +133,7 @@ namespace Bosch_ImportData.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("eng01-srv")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string VaultSRV {
             get {
                 return ((string)(this["VaultSRV"]));
@@ -157,7 +145,7 @@ namespace Bosch_ImportData.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Administrator")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string VaultUser {
             get {
                 return ((string)(this["VaultUser"]));
@@ -181,7 +169,7 @@ namespace Bosch_ImportData.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\KeepSoftwares\\Bosch\\StandardIPJ.ipj")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\KeepCAD\\ImportacaoArquivos\\StandardIPJ.ipj")]
         public string DefaultIPJ {
             get {
                 return ((string)(this["DefaultIPJ"]));

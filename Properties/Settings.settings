@@ -5,9 +5,6 @@
     <Setting Name="tempVaultRootPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\Temp1\VaultWorkFolderBosch\</Value>
     </Setting>
-    <Setting Name="VaultRootPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\VaultWorkFolderBosch\</Value>
-    </Setting>
     <Setting Name="ProjectRootPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">Sites\CtP_TEF\project\</Value>
     </Setting>
@@ -30,19 +27,19 @@
       <Value Profile="(Default)">ContentCenter\pt-BR\</Value>
     </Setting>
     <Setting Name="VaultDB" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Idugel</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="VaultSRV" Type="System.String" Scope="User">
-      <Value Profile="(Default)">eng01-srv</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="VaultUser" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Administrator</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="VaultPassword" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DefaultIPJ" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\KeepSoftwares\Bosch\StandardIPJ.ipj</Value>
+      <Value Profile="(Default)">C:\KeepCAD\ImportacaoArquivos\StandardIPJ.ipj</Value>
     </Setting>
   </Settings>
 </SettingsFile>

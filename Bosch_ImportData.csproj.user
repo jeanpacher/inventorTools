@@ -15,4 +15,8 @@
     <StartAction>Project</StartAction>
     <StartProgram>C:\Program Files\Autodesk\Inventor 2025\Bin\Inventor.exe</StartProgram>
   </PropertyGroup>
+  <PropertyGroup>
+    <ReferencePath>
+    </ReferencePath>
+  </PropertyGroup>
 </Project>
