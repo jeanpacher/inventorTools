@@ -160,6 +160,7 @@
     </Compile>
     <Compile Include="InventorThumbnail.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="PadroesBosch.cs" />
     <Compile Include="PictureConvert.cs" />
     <Compile Include="PluginServer.cs" />
     <Compile Include="Produto2.cs" />
@@ -196,6 +197,9 @@
     <AdditionalFiles Include="Json\Data.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </AdditionalFiles>
+    <EmbeddedResource Include="SplashScreen.resx">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Bosch_ImportData.X.manifest" />
     <AdditionalFiles Include="Json\ProductInformation.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

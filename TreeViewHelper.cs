@@ -8,6 +8,7 @@ using System.Drawing;
 using SharpCompress;
 using System.IO;
 using Autodesk.Connectivity.WebServices;
+using SharpCompress.Common;
 namespace Bosch_ImportData
 {
     public static class TreeViewHelper
@@ -82,16 +83,22 @@ namespace Bosch_ImportData
             }
         }
 
-        public static void CreateTreeView(TreeView treeView, List<Produto2> Produtos)
+        public async static Task CreateTreeView(TreeView treeView, List<Produto2> Produtos, SplashScreen splash)
         {
+            int x = 0;
             treeView.Nodes.Clear();
             foreach (Produto2 produto in Produtos)
             {
-                CreateNodeByPath(treeView, produto);
+                int progress = (int)((x / (float)Produtos.Count) * 100);
+                x++;
+                splash.UpdateProgress(progress, $"Criando a visualização em arvore e a tabela: {produto.FileNameSimplificado}");
+                await Task.Delay(100); // Simula um pequeno delay para a UI ser atualizada
+                
+                await CreateNodeByPath(treeView, produto);
             }
             treeView.SelectedNode = treeView.TopNode;
         }
-        public static void CreateNodeByPath(TreeView treeView, Produto2 prod)
+        public async  static Task CreateNodeByPath(TreeView treeView, Produto2 prod)
         {
             string FullPath = prod.FileNameSimplificado.Replace('/', '\\');
             string[] parts = FullPath.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
@@ -105,7 +112,7 @@ namespace Bosch_ImportData
                 if (NodeCurrent == null)
                 {
                     NodeCurrent = new TreeNode(part);
-                    NodeCurrent.ForeColor = prod.isMissing ? Color.Red : Color.Black;
+                    NodeCurrent.ForeColor = prod.isMissing || prod.Categoria == ProductType.DESCONHECIDO ? Color.Red : Color.Black;
 
                     if (part == parts.Last())
                     {
@@ -120,6 +127,7 @@ namespace Bosch_ImportData
                 }
                 Nodes = NodeCurrent.Nodes;
             }
+            
         }
         public static void ApagarNodeByPath(TreeView treeView, Produto2 produto)
         {
@@ -134,20 +142,25 @@ namespace Bosch_ImportData
             {
                 while (ParentNode.Nodes.Count <= 0)
                 {
-                    if (ParentNode == treeView.TopNode)
-                        break;
+                    //if (ParentNode == treeView.TopNode)
+                    //    break;
 
                     TreeNode nodeCurrent = ParentNode;
                     ParentNode = nodeCurrent.Parent;
 
                     treeView.Nodes.Remove(nodeCurrent);
 
+                    if (ParentNode == null)
+                    {     
+                        break;
+                    }
                 }
+                treeView.SelectedNode = treeView.TopNode;
             }
             catch (Exception e1)
             {
 
-                Log.gravarLog(e1.Message);
+                Log.GravarLog(e1.Message);
             }
            
         }
@@ -218,7 +231,7 @@ namespace Bosch_ImportData
                 if (produto.node == null) continue;
 
                 try { treeView.Nodes.Remove(produto.node); }
-                catch (Exception e1) { Log.gravarLog($"Erro ao remover TreeView Node from: {produto.NewFileName}{System.Environment.NewLine}{e1.Message}"); }
+                catch (Exception e1) { Log.GravarLog($"Erro ao remover TreeView Node from: {produto.NewFileName}{System.Environment.NewLine}{e1.Message}"); }
             }
         }
         private static void CriarNode(List<Produto2> produtos)

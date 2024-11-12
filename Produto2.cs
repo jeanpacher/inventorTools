@@ -22,7 +22,6 @@ namespace Bosch_ImportData
         NORMA_AUXILIAR,
         CONTENTCENTER,
         DESCONHECIDO,
-        VAULT,
         NAOENCONTRADO
     }
     public enum FileType
@@ -57,22 +56,54 @@ namespace Bosch_ImportData
         public string InternalFileName { get; set; }
         public string NewFileName { get; set; }
         public string FileNameSimplificado { get; set; }
+        public string VaultFileName{ get; set; }
         public string OldFileName { get; set; } = string.Empty;
         public bool isMissing { get; set; }
         public bool isVaultExisting { get; set; }
         public bool isAssemblyParticipant { get; set; } = false;
         public string IconName { get; set; }
         public bool IsDeleted { get; set; } = false;
-        public SourceFile sourceFile { get; set; }
+        public SourceFile sourceFile { get; set; } = SourceFile.FromClient;
         public ProductType Categoria { get; set; }
         public FileType TipoArquivo { get; set; }
         public Document Doc { get; set; }
         public List<string> ParentAssembly { get; set; } = new List<string>();
-        public Image Thumbnail { get; set; }
+        public Image Thumbnail { get; set; } = null;
         public Propriedades propriedades { get; set; } = null;
         public TreeNode node { get; set; }
 
         public Produto2() { }
+        public Produto2(string originalFilename, string codigo, bool _isMissing, bool _isVault)
+        {
+            isMissing = _isMissing;
+            isVaultExisting = _isVault;
+
+            if (isMissing && !isVaultExisting)
+            {
+                DefineTypeName(originalFilename, codigo);
+                FileNameSimplificado = Path.Combine("M", FileNameSimplificado.Substring(2));
+                FileNameSimplificado = FileNameSimplificado.Replace("/", "\\");
+            }
+        }
+        public Produto2(File vaultFile, string originalFilename)
+        {
+            isVaultExisting = true;
+            sourceFile = SourceFile.FromVault;
+            isMissing = false;
+            InternalFileName = originalFilename;
+            NewFileName = originalFilename;
+
+            Folder folder = VaultHelper.connection.WebServiceManager.DocumentService.GetFolderById(vaultFile.FolderId);
+            FileNameSimplificado = Path.Combine(folder.FullName, vaultFile.Name);
+            FileNameSimplificado = FileNameSimplificado.Replace("/", "\\");
+            VaultFileName = Path.Combine(Config.Default.tempVaultRootPath, FileNameSimplificado.Substring(2));
+           
+            //DefineType();
+
+            VaultHelper.DownloadFile(vaultFile);
+            VaultHelper.DownloadFile(vaultFile, Path.GetDirectoryName(VaultFileName));
+            isAssemblyParticipant = true;
+        }
         public Produto2(string _internalFilename, string CodNorma, bool missing)
         {
             isMissing = missing;
@@ -88,58 +119,11 @@ namespace Bosch_ImportData
             else
                 IconName = "outros";
 
-
-            // PESQUISANDO OS ARQUIVOS NO VAULT
-            File[] files = null;
-
-            if (VaultHelper.connection != null)
-            {
-                files = VaultHelper.FindFileByName(Path.GetFileName(InternalFileName));
-                if (files == null)
-                    isVaultExisting = false;
-                else
-                    isVaultExisting = true;
-            }
-            //else
-            //    MessageBox.Show("O VAULT não está conectado.", "Erro de conexão com o VAULT", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
-            if (isMissing)
-            {
-                if (isVaultExisting)
-                {
-                    isMissing = false;
-                    sourceFile = SourceFile.FromVault;
-                    SetVaultProduct(files);
-                }
-                else
-                {
-                    sourceFile = SourceFile.IsMissing;
-                    DefineTypeName(InternalFileName, CodNorma);
-                    FileNameSimplificado = FileNameSimplificado.Replace('$', '@');
-                }
-            }
-            else
-            {
-                sourceFile = SourceFile.FromClient;
-                DefineTypeName(InternalFileName, CodNorma);
-            }
-        }
-
-        public void SetVaultProduct(File[] files)
-        {
-            File file = files.FirstOrDefault();
-            Folder folder = VaultHelper.connection.WebServiceManager.DocumentService.GetFolderById(file.FolderId);
-            FileNameSimplificado = Path.Combine(folder.FullName, file.Name);
-            FileNameSimplificado = FileNameSimplificado.Replace("/", "\\");
-            NewFileName = Path.Combine(Config.Default.tempVaultRootPath, FileNameSimplificado.Substring(2));
-            sourceFile = SourceFile.FromVault;
-            DefineType();
-            VaultHelper.DownloadFile(file);
-            VaultHelper.DownloadFile(file, Path.GetDirectoryName(NewFileName));
-            isAssemblyParticipant = true;
+            DefineTypeName(InternalFileName, CodNorma);
 
         }
 
+       
         public void DefineType()
         {
             if (NewFileName.Contains("Catalog"))
@@ -153,35 +137,15 @@ namespace Bosch_ImportData
             else
                 Categoria = ProductType.DESCONHECIDO;
         }
-
-
-
-        //    else if (name.StartsWith(Directory.GetParent(InternalZipFileName).Name))
-        //    {
-
-        //        Categoria = ProductType.ATMOLIB_Library;
-        //        Filename = Path.Combine(temprootPath, Config.Default.Catalog, Directory.GetParent(InternalZipFileName).Name, Path.GetFileName(InternalZipFileName));
-        //    }
-        //    else
-        //    {
-        //        Categoria = ProductType.DESCONHECIDO;
-        //        Filename = Path.Combine(temprootPath, "DESCONHECIDO", fileInfo.Name);
-        //    }
-
-
-
-        //    FileNameSimplificado = Filename.Replace(temprootPath, @"$\");
-
-        //}
         public void DefineTypeName(string filenameOriginal, string codigo)
         {
             string[] bibliotecas = { "en-US", "pt-BR, pt-PT" };
             filenameOriginal = filenameOriginal.Replace("/", "\\");
             string[] parts = filenameOriginal.Split('\\');
             string name = parts.Last();
-            string partial_name = name.Substring(0, codigo.Length);
-
-
+            string partial_name = null;
+            if (name.Contains("_"))
+                partial_name = name.Split('_').First();
 
             if (parts.Length > 2)
             {
@@ -191,27 +155,26 @@ namespace Bosch_ImportData
                 if (bibliotecas.Any(str => str.Contains(parts[parts.Length - 3])))
                 {
                     Categoria = ProductType.CONTENTCENTER;
-                    FileNameSimplificado = Path.Combine("$", Config.Default.ContentCenterRootPath, parts[parts.Length - 3], parts[parts.Length - 2], parts[parts.Length - 1]);
+                    FileNameSimplificado = Path.Combine("$", Config.Default.ContentCenterRootPath, parts[parts.Length - 3], parts[parts.Length - 2], name);
                     FileNameSimplificado = FileNameSimplificado.Replace("/", "\\");
-
                     NewFileName = Path.Combine(Config.Default.tempVaultRootPath, FileNameSimplificado.Substring(2));
                     return;
                 }
             }
-            //if (name.StartsWith(codigo))
+
             if (partial_name == codigo)
             {
                 Categoria = ProductType.NORMA;
-                FileNameSimplificado = Path.Combine("$", Config.Default.ProjectRootPath, codigo, name);
-                NewFileName = Path.Combine(Config.Default.tempVaultRootPath, Config.Default.ProjectRootPath, codigo, Path.GetFileName(filenameOriginal));
+                FileNameSimplificado = Path.Combine("$", Config.Default.Project, codigo, name);
             }
+
             else if (filenameOriginal.Contains("Catalog"))
             {
                 Categoria = ProductType.LIBRARY;
                 string classe = "Catalog";
                 string substring = filenameOriginal.Substring(filenameOriginal.LastIndexOf(classe) + classe.Length + 1);
                 FileNameSimplificado = Path.Combine("$", Config.Default.Catalog, substring);
-                NewFileName = Path.Combine(Config.Default.tempVaultRootPath, FileNameSimplificado.Substring(2));
+                
             }
             else if (filenameOriginal.Contains("Produtos Bosch"))
             {
@@ -219,20 +182,19 @@ namespace Bosch_ImportData
                 string classe = "Produtos Bosch";
                 string substring = filenameOriginal.Substring(filenameOriginal.LastIndexOf(classe) + classe.Length + 1);
                 FileNameSimplificado = Path.Combine("$", Config.Default.ProdutosBosch, substring);
-                NewFileName = Path.Combine(Config.Default.tempVaultRootPath, FileNameSimplificado.Substring(2));
+              
             }
             else if (name.StartsWith("43") || name.StartsWith("45") || name.StartsWith("46") || name.StartsWith("47"))
             {
                 Categoria = ProductType.NORMA_AUXILIAR;
-                FileNameSimplificado = Path.Combine("$", Config.Default.ProjectRootPath, parts[parts.Length - 2], name);
-                NewFileName = Path.Combine(Config.Default.tempVaultRootPath, Config.Default.ProjectRootPath, parts[parts.Length - 2], name);
+                FileNameSimplificado = Path.Combine("$", Config.Default.Project, parts[parts.Length - 2], name);
+             
             }
             else if (filenameOriginal.Contains("Content Center Files"))
             {
                 Categoria = ProductType.CONTENTCENTER;
                 string pasta = name.Split('-').First().TrimEnd(' ');
-                FileNameSimplificado = Path.Combine("$", Config.Default.ContentCenterRootPath, "en-US", pasta, name);
-                NewFileName = Path.Combine(Config.Default.tempVaultRootPath, FileNameSimplificado.Substring(2));
+                FileNameSimplificado = Path.Combine("$", Config.Default.ContentCenterRootPath, "en-US", pasta, name); 
             }
 
             else if (CheckVaultFolders(name))
@@ -242,11 +204,12 @@ namespace Bosch_ImportData
             else
             {
                 Categoria = ProductType.DESCONHECIDO;
-                FileNameSimplificado = Path.Combine("$", "DESCONHECIDO", name);
-                NewFileName = Path.Combine(Config.Default.tempVaultRootPath, "DESCONHECIDO", name);
+                FileNameSimplificado = Path.Combine("DESCONHECIDO", name);
+                
             }
 
             FileNameSimplificado = FileNameSimplificado.Replace("/", "\\");
+            NewFileName = Path.Combine(Config.Default.tempVaultRootPath, FileNameSimplificado.Substring(2));
 
         }
         public int GetFileExtension(string filename)
@@ -273,16 +236,9 @@ namespace Bosch_ImportData
             }
 
         }
-
-        ////    $\ATMOLIB\Library\Catalog
-        ////$\ATMOLIB\Produtos Bosch
-        ////$\Sites\CtP_TEF\project
-        ////$\CONTENTCENTER\en-US
-        ////$\CONTENTCENTER\pt-BR
-        ////$\CONTENTCENTER\pt-PT
         public bool CheckVaultFolders(string name)
         {
-            string inicioName = name.Split(' ').First();
+            string inicioName = name.Split(' ').First().TrimEnd();
             List<string> ListasPastasDisponiveis = new List<string>();
 
             string pastaCatalogs = @"$\ATMOLIB\Library\Catalog";
@@ -347,7 +303,7 @@ namespace Bosch_ImportData
             //} 
             #endregion
         }
-        
+
         public string createProperty(PropertySet customprops, string nomePropriedade)
         {
             try
@@ -406,7 +362,7 @@ namespace Bosch_ImportData
     public class Produto
     {
         public string InternalZipFileName { get; set; }
-        public string Filename { get; set; } = string.Empty;    
+        public string Filename { get; set; } = string.Empty;
         public string OldFileName { get; set; } = string.Empty;
         public bool IsMissing { get; set; }
         public bool IsVaultExisting { get; set; }
@@ -422,16 +378,7 @@ namespace Bosch_ImportData
         public TreeNode Node { get; set; }
     }
 
-    public class Atributos
-    {
-        public List<Atributo> ListaAtributos { get; set; } = new List<Atributo>();
-    }
 
-    public class Atributo
-    {
-        public string ReferenceString { get; set; }
-        public string Norma { get; set; }
-        public string RelativePath { get; set; }
-    }
+
 
 }

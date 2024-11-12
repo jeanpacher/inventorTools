@@ -5,7 +5,7 @@
     <Setting Name="tempVaultRootPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\Temp1\VaultWorkFolderBosch\</Value>
     </Setting>
-    <Setting Name="ProjectRootPath" Type="System.String" Scope="User">
+    <Setting Name="Project" Type="System.String" Scope="User">
       <Value Profile="(Default)">Sites\CtP_TEF\project\</Value>
     </Setting>
     <Setting Name="AtmoRootPath" Type="System.String" Scope="User">

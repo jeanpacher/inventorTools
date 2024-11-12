@@ -10,11 +10,18 @@ using System.Windows.Forms;
 
 namespace Bosch_ImportData
 {
-    public partial class SplashScreen : Form
+    public partial  class SplashScreen : Form
     {
         public SplashScreen()
         {
             InitializeComponent();
+        }
+
+        public  void UpdateProgress(int value, string status)
+        {
+            if (value > 100) value = 95;
+            progressBarStatus.Value = value;
+            lblStatus.Text = status;
         }
     }
 }

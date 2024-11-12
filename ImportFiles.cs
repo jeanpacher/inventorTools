@@ -1,18 +1,20 @@
-﻿using Bosch_ImportData.Properties;
+﻿using Autodesk.Connectivity.WebServices;
+using Bosch_ImportData.Properties;
 using Inventor;
+using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Color = System.Drawing.Color;
 using config = Bosch_ImportData.Properties.Settings;
 using File = System.IO.File;
 using Path = System.IO.Path;
-
-
 
 namespace Bosch_ImportData
 {
@@ -29,37 +31,39 @@ namespace Bosch_ImportData
             //_invApp = invApp;
         }
 
+        public SplashScreen splashScreen;
+        private void StartOperations()
+        {
+            SplashScreen splash = new SplashScreen();
+            splash.Show();
+
+            Task.Run(() =>
+            {
+                for (int i = 0; i <= 100; i += 20)
+                {
+                    Thread.Sleep(500); // Simulando uma operação longa
+                    this.Invoke(new Action(() =>
+                    {
+                        splash.UpdateProgress(i, $"Operação {i}% completa");
+                    }));
+                }
+
+                this.Invoke(new Action(() => splash.Close()));
+            });
+        }
         #region EVENTOS
         private void ImportFiles_Load(object sender, EventArgs e)
         {
             this.Show();
 
+            Root.Deserialize();
 
-            if (Parametros._invApp == null)
-                Parametros._invApp = (Inventor.Application)System.Runtime.InteropServices.Marshal.GetActiveObject("Inventor.Application");
-
-            ToggleWaitCursor(true);
-
-            if (!VaultHelper.ConectarWithAD())
-            {
-                if (!VaultHelper.ConectarWithUserAndPassword())
-                {
-                    MessageBox.Show("Não foi possivel conectar no Autodesk VAULT. Verifique a conexão com o servidor." +
-                        "O software será encerrado", "ERRO DE CONEXÂO COM O VAULT", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    this.Close();
-
-                }
-            }
-
-
-          
-
+            ValidateVaultAndInventorInstances();
+            this.Text = "BOSCH - CONECTADO";
             TableFormat.IconesInventor = InventorIconImageList;
             TableFormat.Tabela = tabelaItens;
 
-            this.Text = "BOSCH - CONECTADO";
-            ToggleWaitCursor(false);
+
         }
         private void ImportFiles_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -71,8 +75,7 @@ namespace Bosch_ImportData
             }
             catch (Exception e1)
             {
-
-                Log.gravarLog(e1.ToString() + System.Environment.NewLine);
+                Log.GravarLog(e1.ToString() + System.Environment.NewLine);
             }
 
         }
@@ -88,7 +91,7 @@ namespace Bosch_ImportData
                 }
             }
         }
-        private void btnExtrair_Click(object sender, EventArgs e)
+        private async void btnExtrair_Click(object sender, EventArgs e)
         {
             ToggleWaitCursor(true);
             ClearUI();
@@ -98,57 +101,120 @@ namespace Bosch_ImportData
             codNorma = new Norma();         // Reinicializa codNorma para garantir que está limpo
             SetTemporaryPaths();
 
-            if (!ExtractFilesFromZip(txtZipFileName.Text))
+            splashScreen = new SplashScreen();
+            splashScreen.Show();
+
+            if (await ExtractFilesFromZip(txtZipFileName.Text) == false)
                 return;
 
-            CreateTextFileWithFileNames();
+            await VerifyLinks();
+            await PesquisarVault();
+            await ReplaceFromVault();
+            await LerCustomParameters();
+            await TreeViewHelper.CreateTreeView(TreeBosch, codNorma.Produtos, splashScreen);
 
-            if (VerifyLinks())
-            {
-                MessageBox.Show("TODOS OS ARQUIVOS NECESSÁRIOS FORAM ENCONTRADOS");
-                BtnCheckIn.Enabled = true;
-            }
-            else
-            {
-                MessageBox.Show("EXISTEM VINCULADOS DE ARQUIVOS FALTANDO NA MONTAGEM PRINCIPAL");
-            }
+            splashScreen.Close();
 
-
-            TreeViewHelper.CreateTreeView(TreeBosch, codNorma.Produtos);
-            //PopulateTreeView();
-            //  CriarTabelaDesconhecida();
             ToggleWaitCursor(false);
+            this.Cursor = Cursors.Default;
+            IsProjectFixed();
+            Parametros.isSystemChange = false;
 
+            MessageBox.Show("FINALIZADO");
+
+        }
+
+        public async Task ReplaceFromVault()
+        {
+            foreach (Produto2 prod in codNorma.Produtos)
+            {
+                if (prod.sourceFile == SourceFile.FromVault)
+                {
+                    await ReplaceFile(prod, prod.VaultFileName);
+                    prod.NewFileName = prod.VaultFileName;
+                    prod.isMissing = false;
+                    prod.isVaultExisting = true;
+                    prod.DefineType();
+
+                }
+            }
+
+            return;
+        }
+
+        private void BtnMoveFiles_Click(object sender, EventArgs e)
+        {
+            Parametros.isSystemChange = true;
+            MoverArquivo();
+            IsProjectFixed();
             Parametros.isSystemChange = false;
 
         }
-        private void button1_Click(object sender, EventArgs e)
+        private void cbLocation_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Parametros._invApp.SilentOperation = true;
-            FecharArquivos();
+            txtFolderToMove.Items.Clear();
+            txtFolderToMove.Text = string.Empty;
 
-            if (codNorma.Produtos.Any(x => x.isMissing))
+            List<string> ListasPastasDisponiveis = new List<string>();
+
+            if (VaultHelper.connection != null)
             {
-                MessageBox.Show("Existem arquivos faltando na montagem");
-                return;
+                ListasPastasDisponiveis = VaultHelper.GetFoldersByPath(cbLocation.Text);
             }
 
-            //else if (Parametros.DicionarioNodes.TryGetValue("$", out TreeNode nodePai))
-            //{
-            //  CriarEstruturaPastas(nodePai.Nodes);
-            CopiarArquivosToVaultFolder();
-            AbrirMontagemToCheckIn();
-
-            //GerarRelatorioByNodes(TreeBosch.Nodes);
-            //GerarRelatorioByProduto();
-
-            MessageBox.Show("Finalizado");
-            Parametros._invApp.SilentOperation = false;
-            //}
+            if (Parametros.DicionarioNodes.TryGetValue(cbLocation.Text.Split('\\').Last(), out TreeNode CurrentNode))
+            {
+                if (CurrentNode.Nodes.Count > 0)
+                {
+                    foreach (TreeNode ChildrenNode in CurrentNode.Nodes)
+                    {
+                        if (!ListasPastasDisponiveis.Contains(ChildrenNode.Text))
+                            ListasPastasDisponiveis.Add(ChildrenNode.Text);
+                    }
+                }
+            }
+            ListasPastasDisponiveis.Sort();
+            txtFolderToMove.Items.AddRange(ListasPastasDisponiveis.ToArray());
         }
-        private void BtnMoveFiles_Click(object sender, EventArgs e)
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            MoverArquivo();
+            if (codNorma == null) return;
+
+            //TabelaDesconhecidos.Rows.Clear();
+
+            //if (tabControl1.SelectedTab.Text == "DESCONHECIDOS")
+            //{
+            //    CriarTabelaDesconhecida();
+            //}
+
+            if (tabControl1.SelectedTab.Text == "TABELA")
+            {
+                TreeBosch.SelectedNode = TreeBosch.TopNode;
+            }
+
+            if (tabControl1.SelectedTab.Text == "ATMOLIB")
+            {
+                CriarTabelaPropriedades();
+            }
+
+            if (tabControl1.SelectedTab.Text == "RELATÓRIOS")
+            {
+                CriarTabelaRelatorios();
+            }
+        }
+        private void TreeViewNorma_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (Parametros.isSystemChange) return;
+
+            Parametros.isSystemChange = true;
+            tabelaItens.Rows.Clear();
+            if (e.Node.Text.Contains('.'))
+            {
+                Produto2 prod = e.Node.Tag as Produto2;
+                AdicionarLinhaTabelaItens(prod);
+            }
+            CriarTabelaItens(e.Node.Nodes);
+            Parametros.isSystemChange = false;
         }
         private void tabelaATMOLIB_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
@@ -177,75 +243,15 @@ namespace Bosch_ImportData
             }
             catch (Exception e1)
             {
-                Log.gravarLog($"Erro ao gravar a propriedade do arquivo: {Path.GetFileName(prod.NewFileName)} {System.Environment.NewLine} ERRO: {e1.ToString()}");
+                Log.GravarLog($"Erro ao gravar a propriedade do arquivo: {Path.GetFileName(prod.NewFileName)} {System.Environment.NewLine} ERRO: {e1.ToString()}");
             }
         }
-        private void TreeViewNorma_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            Parametros.isSystemChange = true;
-            tabelaItens.Rows.Clear();
-            if (e.Node.Text.Contains('.'))
-            {
-                Produto2 prod = e.Node.Tag as Produto2;
-                AdicionarLinhaTabelaItens(prod);
-            }
-            CriarTabelaItens(e.Node.Nodes);
-            Parametros.isSystemChange = false;
-        }
-        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (codNorma == null) return;
-
-            //TabelaDesconhecidos.Rows.Clear();
-
-            //if (tabControl1.SelectedTab.Text == "DESCONHECIDOS")
-            //{
-            //    CriarTabelaDesconhecida();
-            //}
-
-            if (tabControl1.SelectedTab.Text == "TABELA")
-            {
-                TreeBosch.SelectedNode = TreeBosch.TopNode;
-            }
-
-            if (tabControl1.SelectedTab.Text == "ATMOLIB")
-            {
-                CriarTabelaPropriedades();
-            }
-        }
-        private void cbLocation_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            txtFolderToMove.Items.Clear();
-            txtFolderToMove.Text = string.Empty;
-
-            List<string> ListasPastasDisponiveis = new List<string>();
-
-            if (VaultHelper.connection != null)
-            {
-                ListasPastasDisponiveis = VaultHelper.GetFoldersByPath(cbLocation.Text);
-            }
-
-            if (Parametros.DicionarioNodes.TryGetValue(cbLocation.Text.Split('\\').Last(), out TreeNode CurrentNode))
-            {
-                if (CurrentNode.Nodes.Count > 0)
-                {
-                    foreach (TreeNode ChildrenNode in CurrentNode.Nodes)
-                    {
-                        if (!ListasPastasDisponiveis.Contains(ChildrenNode.Text))
-                            ListasPastasDisponiveis.Add(ChildrenNode.Text);
-                    }
-                }
-            }
-            ListasPastasDisponiveis.Sort();
-            txtFolderToMove.Items.AddRange(ListasPastasDisponiveis.ToArray());
-        }
-        private void TabelaItens_CellClick(object sender, DataGridViewCellEventArgs e)
+        private async void TabelaItens_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
+            if (e.ColumnIndex < 0) return;
 
             Produto2 prod = (Produto2)tabelaItens.Rows[e.RowIndex].Tag;
-
-
             if (tabelaItens.Columns[e.ColumnIndex] is DataGridViewCheckBoxColumn && !prod.isVaultExisting)
             {
                 if (e.ColumnIndex == tabelaItens.Columns["ColunaItem"].Index)
@@ -288,6 +294,7 @@ namespace Bosch_ImportData
                     newFileName = Path.Combine(Path.GetDirectoryName(prod.NewFileName), newFileName);
 
                     RenomearArquivo(prod, newFileName, e);
+
                 }
 
 
@@ -304,9 +311,11 @@ namespace Bosch_ImportData
 
                         if (string.IsNullOrEmpty(FileSearched)) return;
 
-                        if (!ReplaceFile(prod, FileSearched)) return;
+                        if (!await ReplaceFile(prod, FileSearched)) return;
 
                         AtualizarUnresolvedFile(prod, FileSearched);
+
+                        IsProjectFixed();
 
                     }
                 }
@@ -321,35 +330,74 @@ namespace Bosch_ImportData
                 }
             }
         }
-        public void AtualizarUnresolvedFile(Produto2 prod, string NewFile)
-		{
+        private void tabelaItens_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
 
-            prod.OldFileName = prod.NewFileName;
-            prod.NewFileName = NewFile;
-            prod.FileNameSimplificado = NewFile.Replace(config.Default.tempVaultRootPath, @"$\");
-            prod.isMissing = false;
-            prod.isAssemblyParticipant = true;
-
-
-            prod.DefineType();
-
-
-            TreeViewHelper.ApagarNodeByPath(TreeBosch, prod);
-            //TreeBosch.Nodes.Remove(prod.node);
-
-            if (Parametros.DicionarioNodesMissing.ContainsKey(prod.OldFileName))
-                Parametros.DicionarioNodesMissing.Remove(prod.OldFileName);
-
-            prod.node = null;
-
-            TreeViewHelper.CreateNodeByPath(TreeBosch, prod);
-
-            // TreeViewHelper.NodeCreate(prod, Parametros.DicionarioNodes);
+            //MostrarMiniatura(e);
+        }
+        private void TabelaDesconhecidos_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            return;
+            MostrarMiniatura(e);
 
         }
+        private void tabelaATMOLIB_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            return;
+            MostrarMiniatura(e);
+
+        }
+        private void btnDeletar_Click(object sender, EventArgs e)
+        {
+
+            List<DataGridViewRow> listaRows = new List<DataGridViewRow>();
+
+            foreach (DataGridViewRow row in tabelaItens.Rows)
+            {
+                if (Convert.ToBoolean(row.Cells["ColunaCheck"].Value) == true && !Convert.ToBoolean(row.Cells["colunaInventor"].Value))
+                {
+                    Produto2 prod = (Produto2)row.Tag;
+
+                    TreeBosch.Nodes.Remove(prod.node);
+                    Parametros.DicionarioNodes.Remove(Path.GetFileName(prod.NewFileName));
+
+                    codNorma.Produtos.Remove(prod);
+                    listaRows.Add(row);
+                }
+            }
+            listaRows.ForEach(tabelaItens.Rows.Remove);
+            //IsProjectFixed();
+
+        }
+
+        private void MoverArquivosToVault()
+        {
+            Parametros._invApp.SilentOperation = true;
+            //FecharArquivos();
+
+            if (codNorma.Produtos.Any(x => x.isMissing))
+            {
+                MessageBox.Show("Existem arquivos faltando na montagem");
+                return;
+            }
+
+            //else if (Parametros.DicionarioNodes.TryGetValue("$", out TreeNode nodePai))
+            //{
+            //  CriarEstruturaPastas(nodePai.Nodes);
+            CopiarArquivosToVaultFolder();
+            AbrirMontagemToCheckIn();
+
+            //GerarRelatorioByNodes(TreeBosch.Nodes);
+            //GerarRelatorioByProduto();
+
+            MessageBox.Show("Finalizado");
+            Parametros._invApp.SilentOperation = false;
+            //}
+        }
+
         #endregion
 
-        #region OPERAÇÔES INTERFACE
+        #region OPERAÇÔES PRODUTO
 
         //RENOMEAR ARQUIVOS
         public bool isNewFileNameExisting(Produto2 prod, string newFileName)
@@ -502,12 +550,10 @@ namespace Bosch_ImportData
                 }
                 catch (Exception e1)
                 {
-                    Log.gravarLog(e1.Message);
+                    Log.GravarLog(e1.Message);
                 }
             }
         }
-
-        //private void 
 
         // PROCURAR ARQUIVO
         public string SearchAndCopyFile(Produto2 prod)
@@ -551,10 +597,11 @@ namespace Bosch_ImportData
             {
 
                 MessageBox.Show("Erro ao copiar o arquivo: " + e1.Message);
+                Log.GravarLog(e1.ToString(), LogName.ProductLog);
                 return string.Empty;
             }
         }
-        public bool ReplaceFile(Produto2 prod, string newFilePath)
+        public async Task<bool> ReplaceFile(Produto2 prod, string newFilePath)
         {
             Parametros._invApp.SilentOperation = true;
             foreach (string parentFileName in prod.ParentAssembly)
@@ -587,13 +634,12 @@ namespace Bosch_ImportData
                 {
                     MessageBox.Show(e1.ToString());
                     Parametros._invApp.SilentOperation = false;
-                    Log.gravarLog(e1.Message);
+                    Log.GravarLog(e1.Message);
                     return false;
                 }
             }
             return false;
         }
-
 
         //APAGAR ARQUIVOS
         public void RemoverArquivo()
@@ -615,175 +661,51 @@ namespace Bosch_ImportData
                 }
             }
             listaRows.ForEach(tabelaItens.Rows.Remove);
-            IsDesconhecidosEmpty();
+            IsProjectFixed();
         }
-
-
-        #endregion
-
-        #region OPERAÇÔES INICIAIS
-
-        private void ToggleWaitCursor(bool isWaitCursor)
-        {
-            this.UseWaitCursor = isWaitCursor;
-        }
-        private void ClearUI()
-        {
-            Parametros._invApp.Documents.CloseAll();
-            TreeBosch.Nodes.Clear();
-            tabelaItens.Rows.Clear();
-            // TabelaDesconhecidos.Rows.Clear();
-            tabelaATMOLIB.Rows.Clear();
-
-            cbLocation.Text = string.Empty;
-            txtFolderToMove.Text = string.Empty;
-
-        }
-        private void SetTemporaryPaths()
-        {
-            Properties.Settings.Default.tempVaultRootPath = Path.Combine(Parametros.tempLocation, Path.GetFileNameWithoutExtension(Path.GetTempFileName()));
-            Parametros.ipjPadrao = Path.Combine(config.Default.tempVaultRootPath, Parametros.ipjFileName);
-        }
-        private bool ExtractFilesFromZip(string zipFileName)
-        {
-            if (string.IsNullOrEmpty(zipFileName) || !File.Exists(zipFileName))
-            {
-                ToggleWaitCursor(false);
-                return false;
-            }
-
-            FileManipulateHelper zipfileManipulate = new FileManipulateHelper(tabelaItens, InventorIconImageList);
-            codNorma = zipfileManipulate.ExtractZip(zipFileName);
-
-            return true;
-        }
-        private void PopulateTreeView()
-        {
-            // CRIAR A TREEVIEW         
-            TreeViewHelper.PopulateTreeView(TreeBosch, codNorma);
-            TreeBosch.SelectedNode = TreeBosch.TopNode;
-        }
-        private void CreateTextFileWithFileNames()
-        {
-            foreach (Produto2 prod in codNorma.Produtos)
-            {
-                string filePath = config.Default.tempVaultRootPath + codNorma.CodigoNorma + ".txt";
-                File.AppendAllText(filePath, prod.NewFileName + System.Environment.NewLine);
-            }
-        }
-        private bool VerifyLinks()
+        public void AtualizarUnresolvedFile(Produto2 prod, string NewFile)
         {
 
-            Parametros.mainAssemblyPath = Directory.GetFiles(config.Default.tempVaultRootPath, codNorma.CodigoNorma + ".iam", SearchOption.AllDirectories).FirstOrDefault();
-            string mainDrawingPath = Directory.GetFiles(config.Default.tempVaultRootPath, codNorma.CodigoNorma + ".idw", SearchOption.AllDirectories).FirstOrDefault();
-            if (string.IsNullOrEmpty(Parametros.mainAssemblyPath))
+            prod.OldFileName = prod.NewFileName;
+            prod.NewFileName = NewFile;
+            prod.FileNameSimplificado = NewFile.Replace(config.Default.tempVaultRootPath, @"$\");
+            prod.isMissing = false;
+            prod.isAssemblyParticipant = true;
+
+
+            prod.DefineType();
+
+            if (prod.Categoria == ProductType.LIBRARY)
             {
-                MessageBox.Show("Montagem não encontrada");
-                Parametros.isResolved = false;
-                return Parametros.isResolved;
-            }
-
-            if (!File.Exists(config.Default.DefaultIPJ))
-            {
-                MessageBox.Show("Arquivo IPJ não encontrado.\nVerifique se existe o arquivo: " + config.Default.DefaultIPJ);
-                Parametros.isResolved = false;
-                return Parametros.isResolved;
-            }
-            FileInfo ipjFile = new FileInfo(config.Default.DefaultIPJ);
-            ipjFile.CopyTo(Parametros.ipjPadrao, true);
-            Parametros.isResolved = true;
-
-            try
-            {
-                if (Parametros._invApp.Documents.Count > 0)
-                    Parametros._invApp = (Inventor.Application)Activator.CreateInstance(Type.GetTypeFromProgID("Inventor.Application"));
-            }
-            catch (Exception)
-            {
-                //Parametros._invApp = (Inventor.Application)Activator.CreateInstance(Categoria.GetTypeFromProgID("Inventor.Application"));
-                Log.gravarLog("Erro ao pegar a instancia do Inventor");
-            }
-
-
-            Parametros._invApp.Visible = true;
-            Parametros._invApp.SilentOperation = true;
-            List<string> item = new List<string>();
-            //AssemblyDocument asmDoc = null;
-            if (Parametros._invApp.Documents.Count == 0)
-            {
-                // Abrir um novo projeto
-                Parametros._invApp.DesignProjectManager.DesignProjects.AddExisting(Parametros.ipjPadrao).Activate();
-                codNorma.oAsmDoc = Parametros._invApp.Documents.Open(Parametros.mainAssemblyPath, true) as AssemblyDocument;
-                codNorma.Produtos.Find(x => x.NewFileName == Parametros.mainAssemblyPath).isAssemblyParticipant = true;
-
-                checkLinkRecursive(codNorma.oAsmDoc, item);
-            }
-            else
-            {
-                MessageBox.Show("Todos os arquivos do Inventor precisam estar fechados. Por favor, feche todos os arquivos e tente novamente");
-            }
-
-            Parametros._invApp.SilentOperation = false;
-            return Parametros.isResolved;
-        }
-        public void checkLinkRecursive(AssemblyDocument asmDoc, List<string> item)
-        {
-            foreach (DocumentDescriptor descriptor in asmDoc.ReferencedDocumentDescriptors)
-            {
-                if (item.Contains(descriptor.FullDocumentName))
-                    continue;
-
-                item.Add(descriptor.FullDocumentName);
-
-
-                if (descriptor.ReferenceMissing)
+                try
                 {
-                    Produto2 prod = new Produto2(descriptor.FullDocumentName, codNorma.CodigoNorma, true);
-                    codNorma.Produtos.Add(prod);
-                    prod.ParentAssembly.Add(asmDoc.FullFileName);
-                    Log.gravarLog($"Arquivo faltante: {descriptor.FullDocumentName} {System.Environment.NewLine}");
-                    Parametros.isResolved = false;
+                    Document doc = Parametros._invApp.Documents.Open(prod.NewFileName, false);
+                    prod.propriedades = new Propriedades(doc);
+                    doc.Save();
+                    doc.Close();
                 }
-                else
+                catch (Exception e1)
                 {
-                    Produto2 prod = codNorma.Produtos.Find(x => x.NewFileName == descriptor.FullDocumentName);
 
-                    if (prod == null)
-                    {
-                        MessageBox.Show("Produto2 nulo: " + descriptor.FullDocumentName);
-                        continue;
-                    }
-                    prod.isAssemblyParticipant = true;
-                    Document doc1 = Parametros._invApp.Documents.Open(descriptor.FullDocumentName, false);
-                    prod.Thumbnail = InventorThumbnail.GetThumbnail(doc1);
-
-                    if (prod.Categoria == ProductType.LIBRARY)
-                    {
-                        Document doc = Parametros._invApp.Documents.Open(descriptor.FullDocumentName, false);
-                        prod.Doc = doc;
-                        prod.propriedades = new Propriedades(doc);
-
-                    }
-                    if (descriptor.FullDocumentName.EndsWith(".iam"))
-                    {
-                        checkLinkRecursive(Parametros._invApp.Documents.Open(descriptor.FullDocumentName, false) as AssemblyDocument, item);
-                    }
+                    Log.GravarLog($"Erro ao preencher as propriedades: {prod.NewFileName} --- {e1.ToString()}");
                 }
+
             }
+
+
+            TreeViewHelper.ApagarNodeByPath(TreeBosch, prod);
+            //TreeBosch.Nodes.Remove(prod.node);
+
+            if (Parametros.DicionarioNodesMissing.ContainsKey(prod.OldFileName))
+                Parametros.DicionarioNodesMissing.Remove(prod.OldFileName);
+
+            prod.node = null;
+
+            TreeViewHelper.CreateNodeByPath(TreeBosch, prod);
+
+            // TreeViewHelper.NodeCreate(prod, Parametros.DicionarioNodes);
+
         }
-        private void CreateReportFilesFromProdutos()
-        {
-            foreach (Produto2 prod in codNorma.Produtos)
-            {
-                string filePath = config.Default.tempVaultRootPath + codNorma.CodigoNorma + ".txt";
-                File.AppendAllText(filePath, prod.NewFileName + System.Environment.NewLine);
-            }
-        }
-
-        #endregion
-
-        #region OPERAÇÔES PRODUTO
-
         public bool apagarArquivo(string filename)
         {
             try
@@ -805,131 +727,6 @@ namespace Bosch_ImportData
             prod.FileNameSimplificado = newFileName.Replace(config.Default.tempVaultRootPath, @"$\");
             prod.node.Text = Path.GetFileName(prod.NewFileName);
         }
-
-
-        #endregion
-
-
-        // Método para validar o nome do arquivo
-        private bool IsValidFileName(string fileName)
-        {
-            string invalidChars = new string(Path.GetInvalidFileNameChars());
-            Regex regex = new Regex($"[{Regex.Escape(invalidChars)}]");
-            return true;
-            // return !regex.IsMatch(fileName);
-        }
-        public void PesquisarTreeNodes(TreeNode nodeParent)
-        {
-            foreach (TreeNode node in nodeParent.Nodes)
-            {
-                if (node.Parent == null) continue;
-
-                if (nodeParent.Text == "Catalog")
-                {
-                    foreach (TreeNode nodeFilho in nodeParent.Nodes)
-                    {
-                        Parametros.pastas.Add(nodeFilho.Text);
-                    }
-                    return;
-                }
-
-                if (node.Nodes != null)
-                {
-                    PesquisarTreeNodes(node);
-                }
-            }
-        }
-
-        #region OPERAÇÕES DE TABELAS
-
-        public void CriarTabelaItens(TreeNodeCollection nodes)
-        {
-            foreach (TreeNode node in nodes)
-            {
-                Produto2 prod = node.Tag as Produto2;
-                if (prod == null || !node.Text.Contains('.'))
-                {
-                    CriarTabelaItens(node.Nodes);
-                }
-                else
-                {
-                    AdicionarLinhaTabelaItens(prod);
-
-                    if (node.Nodes.Count > 0)
-                    {
-                        CriarTabelaItens(node.Nodes);
-                    }
-                }
-            }
-        }
-        public void AdicionarLinhaTabelaItens(Produto2 prod)
-        {
-
-            int rowIndex = tabelaItens.Rows.Add(TableFormat.Linha(prod));
-        }
-        public void CriarTabelaPropriedades()
-        {
-            tabelaATMOLIB.Rows.Clear();
-
-            foreach (Produto2 prod in codNorma.Produtos)
-            {
-
-                if (prod.Categoria == ProductType.LIBRARY && !prod.isMissing)
-                {
-                    if (prod.propriedades == null) continue;
-
-                    int rowIndex = tabelaATMOLIB.Rows.Add(
-                           prod.isVaultExisting,
-                           Path.GetDirectoryName(prod.NewFileName).Split('\\').Last(),
-                           Path.GetFileName(prod.NewFileName),
-                           prod.propriedades.RBGBDETAILS,
-                           prod.propriedades.RBGBPRODUCERNAME,
-                           prod.propriedades.RBGBPRODUCERORDERNO);
-
-                    tabelaATMOLIB.Rows[rowIndex].Tag = prod;
-                    tabelaATMOLIB.Rows[rowIndex].ReadOnly = prod.isVaultExisting;
-
-                }
-            }
-        }
-
-        //private void CriarTabelaDesconhecida()
-        //{
-        //    if (codNorma.Produtos.Any(x => x.Categoria == ProductType.DESCONHECIDO))
-        //    {
-        //        BtnCheckIn.Enabled = false;
-        //        if (!tabControl1.TabPages.Contains(tabDesconhecidos))
-        //            tabControl1.TabPages.Add(tabDesconhecidos);
-
-        //        foreach (Produto2 prod in codNorma.Produtos)
-        //        {
-        //            if (prod.Categoria == ProductType.DESCONHECIDO)
-        //            {
-        //                AdicionarLinhaTabelaDesconhecidos(prod);
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (tabControl1.TabPages.Contains(tabDesconhecidos))
-        //            tabControl1.TabPages.Remove(tabDesconhecidos);
-        //    }
-        //}
-
-        //private void AdicionarLinhaTabelaDesconhecidos(Produto2 prod)
-        //{
-
-        //    int rowIndex = TabelaDesconhecidos.Rows.Add(
-        //            false,
-        //            prod.isAssemblyParticipant,
-        //            $"{Path.GetFileName(prod.Filename)}",
-        //            prod.InternalZipFileName);
-
-        //    TabelaDesconhecidos.Rows[rowIndex].Tag = prod;
-        //}
-        #endregion
-
-
         public bool MoverArquivo()
         {
             if (string.IsNullOrEmpty(txtFolderToMove.Text) || string.IsNullOrEmpty(cbLocation.Text))
@@ -991,12 +788,12 @@ namespace Bosch_ImportData
                         Directory.CreateDirectory(Path.GetDirectoryName(prod.NewFileName));
 
                     ProcurarArquivosToRename(prod.NewFileName, prod.OldFileName);
-                    if (prod.Categoria == ProductType.LIBRARY)
-                    {
-                        Document doc = Parametros._invApp.Documents.Open(prod.NewFileName, false);
-                        prod.Doc = doc;
-                        prod.propriedades = new Propriedades(doc);
-                    }
+                    //if (prod.Categoria == ProductType.LIBRARY)
+                    //{
+                    //    Document doc = Parametros._invApp.Documents.Open(prod.NewFileName, false);
+                    //    prod.Doc = doc;
+                    //    prod.propriedades = new Propriedades(doc);
+                    //}
 
                     codNorma.oAsmDoc.Update2(true);
                     codNorma.oAsmDoc.Save2(true);
@@ -1008,7 +805,7 @@ namespace Bosch_ImportData
             if (codNorma.Produtos.Any(x => x.Categoria == ProductType.DESCONHECIDO))
             {
                 listaRows.ForEach(tabelaItens.Rows.Remove);
-                BtnCheckIn.Enabled = true;
+                BtnCheckInAtmo.Enabled = true;
                 TreeBosch.SelectedNode = TreeBosch.TopNode;
                 return true;
             }
@@ -1016,42 +813,52 @@ namespace Bosch_ImportData
                 return false;
 
             //return;
-            //IsDesconhecidosEmpty();
+            //IsProjectFixed();
         }
-        private bool IsDesconhecidosEmpty()
+        private bool IsProjectFixed()
         {
+            if (codNorma.Produtos.Any(x => x.isMissing)) return false;
+
+            try
+            {
+                codNorma.oAsmDoc.ResolveFile();
+                codNorma.oAsmDoc.Save2(true);
+            }
+            catch (Exception e1)
+            {
+                Log.GravarLog($"Erro ao tentar resolver e salvar o arquivo: {codNorma.oAsmDoc.FullDocumentName} -- {e1.Message}", LogName.ProductLog);
+            }
+
             if (codNorma.Produtos.Any(x => x.Categoria == ProductType.DESCONHECIDO)) return false;
 
+            BtnCheckInAtmo.Enabled = true;
 
-            BtnCheckIn.Enabled = true;
-            // tabControl1.TabPages.Remove(tabDesconhecidos);
-            if (Parametros.DicionarioNodes.TryGetValue("DESCONHECIDO", out TreeNode node))
+            List<Produto2> AtmoLibList = codNorma.Produtos.Where(x => x.Categoria == ProductType.LIBRARY).ToList();
+
+            if (AtmoLibList.Any(x => x.isVaultExisting == false))
             {
-                TreeBosch.Nodes.Remove(node);
-                tabelaItens.Rows.Clear();
-                TreeBosch.SelectedNode = TreeBosch.TopNode;
-                CriarTabelaItens(TreeBosch.Nodes[0].Nodes);
+                btnCheckInNorma.Enabled = false;
+                BtnCheckInAtmo.Enabled = true;
             }
+            else
+            {
+                btnCheckInNorma.Enabled = true;
+                BtnCheckInAtmo.Enabled = false;
+            }
+
+
+            //// tabControl1.TabPages.Remove(tabDesconhecidos);
+            //if (Parametros.DicionarioNodes.TryGetValue("DESCONHECIDO", out TreeNode node))
+            //{
+            //    TreeBosch.Nodes.Remove(node);
+            //    tabelaItens.Rows.Clear();
+            //    TreeBosch.SelectedNode = TreeBosch.TopNode;
+            //    CriarTabelaItens(TreeBosch.Nodes[0].Nodes);
+            //}
 
             return true;
         }
 
-        private void CheckAll_Click(object sender, EventArgs e)
-        {
-            foreach (DataGridViewRow row in tabelaItens.SelectedRows)
-            {
-                Produto2 prod = (Produto2)row.Tag;
-                if (!prod.isVaultExisting)
-                    row.Cells[0].Value = true;
-            }
-        }
-        private void UncheckAll_Click(object sender, EventArgs e)
-        {
-            foreach (DataGridViewRow row in tabelaItens.SelectedRows)
-            {
-                row.Cells[0].Value = false;
-            }
-        }
         private void AtualizarReferenciaNaMontagem(Produto2 prod)
         {
             AssemblyDocument assemblyDoc = Parametros._invApp.ActiveDocument as AssemblyDocument;
@@ -1112,11 +919,328 @@ namespace Bosch_ImportData
                 ExecutarComandoCheckIn();
             }
         }
+
+        #endregion
+
+        #region VALIDAÇÔES
+        public bool ValidateVaultAndInventorInstances()
+        {
+            if (!VaultHelper.ConectarWithAD())
+            {
+                if (!VaultHelper.ConectarWithUserAndPassword())
+                {
+                    Log.GravarLog("Erro ao conectar ao Vault. Credenciais erradas", LogName.AppLog);
+                    MessageBox.Show("Não foi possivel conectar no Autodesk VAULT. Verifique a conexão com o servidor." +
+                        "O software será encerrado", "ERRO DE CONEXÂO COM O VAULT", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.Close();
+                }
+            }
+            if (Parametros._invApp == null)
+            {
+                try
+                {
+                    Parametros._invApp = (Inventor.Application)System.Runtime.InteropServices.Marshal.GetActiveObject("Inventor.Application");
+                }
+                catch (Exception e1)
+                {
+                    Log.GravarLog("Erro ao iniciar a instância do Inventor", LogName.AppLog);
+                    Log.GravarLog(e1.ToString(), LogName.AppLog);
+                    MessageBox.Show(@"Erro Inexperado ao tentar abrir a instância do Inventor. Favor enviar o log para a KeepCAD\n " +
+                        @"Pasta do log: C:\KeepCAD\ImportacaoArquivos\Log\AppLog.txt");
+                    return false;
+                }
+            }
+            return true;
+        }
+        private async Task<bool> VerifyLinks()
+        {
+            splashScreen.UpdateProgress(30, "Abrindo a montagem no Inventor para verificar possiveis erros de vinculos de peças");
+
+            Parametros.mainAssemblyPath = Directory.GetFiles(config.Default.tempVaultRootPath, codNorma.CodigoNorma + ".iam", SearchOption.AllDirectories).FirstOrDefault();
+            string mainDrawingPath = Directory.GetFiles(config.Default.tempVaultRootPath, codNorma.CodigoNorma + ".idw", SearchOption.AllDirectories).FirstOrDefault();
+
+            if (string.IsNullOrEmpty(Parametros.mainAssemblyPath))
+            {
+                Log.GravarLog($"Montagem: {codNorma.CodigoNorma}.iam não encontrada", LogName.ProductLog);
+                MessageBox.Show("Montagem não encontrada");
+                Parametros.isResolved = false;
+                return Parametros.isResolved;
+            }
+
+            if (!File.Exists(config.Default.DefaultIPJ))
+            {
+                Log.GravarLog($@"IPJ Padrão não encontrado em: C:\KeepCAD\ImportacaoArquivos\StandardIPJ.ipj", LogName.ProductLog);
+                MessageBox.Show("Arquivo IPJ não encontrado.\nVerifique se existe o arquivo: " + config.Default.DefaultIPJ);
+                Parametros.isResolved = false;
+                return Parametros.isResolved;
+            }
+
+            FileInfo ipjFile = new FileInfo(config.Default.DefaultIPJ);
+            ipjFile.CopyTo(Parametros.ipjPadrao, true);
+
+
+            try
+            {
+                if (Parametros._invApp.Documents.Count > 0)
+                    Parametros._invApp = (Inventor.Application)Activator.CreateInstance(Type.GetTypeFromProgID("Inventor.Application"));
+            }
+            catch (Exception)
+            {
+                //Parametros._invApp = (Inventor.Application)Activator.CreateInstance(Categoria.GetTypeFromProgID("Inventor.Application"));
+                Log.GravarLog("Erro ao pegar a instancia do Inventor");
+            }
+
+
+            Parametros._invApp.Visible = true;
+            Parametros._invApp.SilentOperation = true;
+            List<string> item = new List<string>();
+
+
+            if (Parametros._invApp.Documents.Count == 0)
+            {
+                // Abrir um novo projeto
+                Parametros._invApp.DesignProjectManager.DesignProjects.AddExisting(Parametros.ipjPadrao).Activate();
+                codNorma.oAsmDoc = Parametros._invApp.Documents.Open(Parametros.mainAssemblyPath, true) as AssemblyDocument;
+                codNorma.Produtos.Find(x => x.NewFileName == Parametros.mainAssemblyPath).isAssemblyParticipant = true;
+
+                int y = codNorma.oAsmDoc.AllReferencedDocuments.Count;
+                await checkLinkRecursive(codNorma.oAsmDoc, item, 0, y);
+
+                codNorma.oAsmDoc.Save2(true);
+                codNorma.oAsmDoc.Update();
+                //codNorma.oAsmDoc.Close();
+                //Parametros._invApp.Documents.Open(codNorma.oAsmDoc.FullFileName, true);
+
+
+            }
+            else
+            {
+                MessageBox.Show("Todos os arquivos do Inventor precisam estar fechados. Por favor, feche todos os arquivos e tente novamente");
+            }
+
+            Parametros._invApp.SilentOperation = false;
+            return Parametros.isResolved;
+        }
+        public async Task checkLinkRecursive(AssemblyDocument asmDoc, List<string> item, int contagem, int y)
+        {
+            foreach (DocumentDescriptor descriptor in asmDoc.ReferencedDocumentDescriptors)
+            {
+                if (item.Contains(descriptor.FullDocumentName))
+                    continue;
+
+                item.Add(descriptor.FullDocumentName);
+
+                contagem++;
+                int progress = (int)((contagem / (float)y) * 100);
+                splashScreen.UpdateProgress(progress, $"Analisando os arquivos na montagem: {descriptor.FullDocumentName}");
+                await Task.Delay(100); // Simula um pequeno delay para a UI ser atualizada
+
+                if (descriptor.ReferenceMissing)
+                {
+                    // PESQUISANDO OS ARQUIVOS NO VAULT
+                    Autodesk.Connectivity.WebServices.File[] files = null;
+                    Produto2 produto = null;
+
+                    if (VaultHelper.connection != null)
+                    {
+                        files = VaultHelper.FindFileByName(Path.GetFileName(Path.GetFileName(descriptor.FullDocumentName)));
+                        if (files == null)
+                        {
+                            produto = new Produto2(descriptor.FullDocumentName, codNorma.CodigoNorma, true, false);
+                            Log.GravarLog($"{descriptor.FullDocumentName};Não encontrado no pacote ZIP e nem no Vault", LogName.ProductLog);
+                            Log.GravarLog($"MISSING: {descriptor.FullDocumentName}", LogName.ArquivosFaltantes);
+                            Parametros.isResolved = false;
+                        }
+                        else
+                        {
+                            produto = new Produto2(files[0], descriptor.FullDocumentName);
+                            //  produto.NewFileName = 
+                            Log.GravarLog($"{descriptor.FullDocumentName};Não encontrado no pacote ZIP, mas encontrado no Vault;{files.First().Name}", LogName.ProductLog);
+                            Log.GravarLog($"FOUND ON VAULT: {descriptor.FullDocumentName} - VAULT NAME: {files.First().Name}", LogName.ArquivosFaltantes);
+                        }
+                    }
+
+                    if (produto != null)
+                    {
+                        codNorma.Produtos.Add(produto);
+                        produto.ParentAssembly.Add(asmDoc.FullFileName);
+                    }
+                }
+                else
+                {
+                    Produto2 prod = codNorma.Produtos.Find(x => x.NewFileName == descriptor.FullDocumentName);
+
+                    if (prod == null)
+                    {
+                        MessageBox.Show("Produto nulo: " + descriptor.FullDocumentName);
+                        continue;
+                    }
+
+                    prod.isAssemblyParticipant = true;
+
+                    if (descriptor.FullDocumentName.EndsWith(".iam"))
+                    {
+                        await checkLinkRecursive(Parametros._invApp.Documents.Open(descriptor.FullDocumentName, false) as AssemblyDocument, item, contagem, y);
+                    }
+                }
+            }
+        }
+
+        private async Task PesquisarVault()
+        {
+            // PESQUISANDO OS ARQUIVOS NO VAULT
+            if (VaultHelper.connection == null) return;
+            int contagem = 0;
+
+            foreach (Produto2 prod in codNorma.Produtos)
+            {
+                int progress = (int)((contagem / (float)codNorma.Produtos.Count) * 100);
+                splashScreen.UpdateProgress(progress, $"Pesquisando se os arquivos existem no Vault: {prod.NewFileName}");
+                await Task.Delay(100); // Simula um pequeno delay para a UI ser atualizada
+                contagem++;
+
+                //if (prod.isMissing) continue;
+
+                Autodesk.Connectivity.WebServices.File[] files = VaultHelper.FindFileByName(Path.GetFileName(prod.NewFileName));
+                if (files == null)
+                    prod.isVaultExisting = false;
+                else
+                    prod.isVaultExisting = true;
+
+            }
+        }
+        public async Task LerCustomParameters()
+        {
+            int total = codNorma.Produtos.Count(x => x.Categoria == ProductType.LIBRARY);
+            int contagem = 1;
+            foreach (Produto2 prod in codNorma.Produtos)
+            {
+                if (prod.Categoria == ProductType.LIBRARY && !prod.isVaultExisting && !prod.isMissing)
+                {
+                    int progress = (int)((contagem / (float)total) * 100);
+                    splashScreen.UpdateProgress(progress, $"Lendo propriedades custom da ATMOLIB: {prod.NewFileName}");
+                    await Task.Delay(100); // Simula um pequeno delay para a UI ser atualizada
+                    contagem++;
+
+                    Document doc = Parametros._invApp.Documents.Open(prod.NewFileName, false);
+                    prod.Doc = doc;
+                    prod.propriedades = new Propriedades(doc);
+                    doc.Save();
+                    doc.Close();
+                }
+            }
+        }
+        private bool IsValidFileName(string fileName)
+        {
+            string invalidChars = new string(Path.GetInvalidFileNameChars());
+            Regex regex = new Regex($"[{Regex.Escape(invalidChars)}]");
+            return true;
+            // return !regex.IsMatch(fileName);
+        }
+        #endregion
+
+        #region OPERAÇÕES DE APOIO
+        private void ToggleWaitCursor(bool isWaitCursor)
+        {
+            this.UseWaitCursor = isWaitCursor;
+        }
+        private void ClearUI()
+        {
+            Parametros._invApp.Documents.CloseAll();
+            TreeBosch.Nodes.Clear();
+            tabelaItens.Rows.Clear();
+            // TabelaDesconhecidos.Rows.Clear();
+            tabelaATMOLIB.Rows.Clear();
+            tabelaRelatorios.Rows.Clear();
+            btnCheckInNorma.Enabled = false;
+            BtnCheckInAtmo.Enabled = false;
+
+            cbLocation.Text = string.Empty;
+            txtFolderToMove.Text = string.Empty;
+
+        }
+        private void SetTemporaryPaths()
+        {
+            Properties.Settings.Default.tempVaultRootPath = Path.Combine(Parametros.tempLocation, Path.GetFileNameWithoutExtension(Path.GetTempFileName()));
+            Parametros.ipjPadrao = Path.Combine(config.Default.tempVaultRootPath, Parametros.ipjFileName);
+        }
+        private async Task<bool> ExtractFilesFromZip(string zipFileName)
+        {
+            if (string.IsNullOrEmpty(zipFileName) || !File.Exists(zipFileName))
+            {
+                ToggleWaitCursor(false);
+                return false;
+            }
+
+
+            FileManipulateHelper zipfileManipulate = new FileManipulateHelper();
+            codNorma = await zipfileManipulate.ExtractZip(zipFileName, splashScreen);
+
+            return true;
+        }
+        private void PopulateTreeView()
+        {
+            // CRIAR A TREEVIEW         
+            TreeViewHelper.PopulateTreeView(TreeBosch, codNorma);
+            TreeBosch.SelectedNode = TreeBosch.TopNode;
+        }
+        private void CheckAll_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in tabelaItens.SelectedRows)
+            {
+                Produto2 prod = (Produto2)row.Tag;
+                if (!prod.isVaultExisting)
+                    row.Cells[0].Value = true;
+            }
+        }
+        private void UncheckAll_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in tabelaItens.SelectedRows)
+            {
+                row.Cells[0].Value = false;
+            }
+        }
+        private void CreateTextFileWithFileNames()
+        {
+            foreach (Produto2 prod in codNorma.Produtos)
+            {
+                string filePath = config.Default.tempVaultRootPath + codNorma.CodigoNorma + ".txt";
+                File.AppendAllText(filePath, prod.NewFileName + System.Environment.NewLine);
+            }
+        }
+        private void CreateReportFilesFromProdutos()
+        {
+            foreach (Produto2 prod in codNorma.Produtos)
+            {
+                string filePath = config.Default.tempVaultRootPath + codNorma.CodigoNorma + ".txt";
+                File.AppendAllText(filePath, prod.NewFileName + System.Environment.NewLine);
+            }
+        }
+        public void PesquisarTreeNodes(TreeNode nodeParent)
+        {
+            foreach (TreeNode node in nodeParent.Nodes)
+            {
+                if (node.Parent == null) continue;
+
+                if (nodeParent.Text == "Catalog")
+                {
+                    foreach (TreeNode nodeFilho in nodeParent.Nodes)
+                    {
+                        Parametros.pastas.Add(nodeFilho.Text);
+                    }
+                    return;
+                }
+
+                if (node.Nodes != null)
+                {
+                    PesquisarTreeNodes(node);
+                }
+            }
+        }
         public void CriarEstruturaPastas(TreeNodeCollection Nodes)
         {
             foreach (TreeNode node in Nodes)
             {
-
                 try
                 {
                     string extension = node.FullPath.Split('.').Last();
@@ -1129,7 +1253,6 @@ namespace Bosch_ImportData
                         {
                             Directory.CreateDirectory(directory);
                         }
-
                     }
 
                     if (node.Nodes.Count > 0)
@@ -1140,11 +1263,71 @@ namespace Bosch_ImportData
                 catch (Exception e1)
                 {
 
-                    Log.gravarLog(e1.Message);
+                    Log.GravarLog(e1.Message);
                 }
 
             }
         }
+        public void ExecutarComandoCheckIn()
+        {
+            try
+            {
+                Parametros._invApp.SilentOperation = false;
+                CommandManager commandManager = Parametros._invApp.CommandManager;
+                commandManager.ControlDefinitions["VaultCheckinTop"].Execute();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao executar o comando: " + ex.ToString());
+            }
+        }
+        public void ListarComandos()
+        {
+            try
+            {
+
+                CommandManager commandManager = Parametros._invApp.CommandManager;
+
+                foreach (ControlDefinition ctrlDef in commandManager.ControlDefinitions)
+                {
+                    File.AppendAllText(@"C:\KeepSoftwares\Bosch\Log\arquivos.txt", $"Command Name: {ctrlDef.DisplayName}, ID: {ctrlDef.InternalName}{System.Environment.NewLine}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao listar comandos: " + ex.Message);
+            }
+        }
+
+        public void MostrarMiniatura(DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                Produto2 prod = (Produto2)tabelaItens.Rows[e.RowIndex].Tag;
+                if (prod.Thumbnail == null)
+                {
+                    try
+                    {
+                        Document doc = Parametros._invApp.Documents.Open(prod.NewFileName, false);
+                        prod.Thumbnail = InventorThumbnail.GetThumbnail(doc);
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Não foi possivel gerar a visualização");
+                        return;
+
+                    }
+
+                    Form_Imagem form = new Form_Imagem();
+                    form.imagem(prod.Thumbnail);
+                    form.Show();
+                }
+            }
+        }
+
+        #endregion
+
+        #region RELATORIOS
         public void GerarRelatorioByNodes(TreeNodeCollection Nodes)
         {
             string VaultWorkFolder = $@"C:\daten\users\{System.Environment.UserName}\VAULT-Root";
@@ -1189,98 +1372,319 @@ namespace Bosch_ImportData
 
             File.AppendAllText(logPath, $"{linha}{System.Environment.NewLine}");
         }
-        public void ExecutarComandoCheckIn()
-        {
-            try
-            {
-                Parametros._invApp.SilentOperation = false;
-                CommandManager commandManager = Parametros._invApp.CommandManager;
-                commandManager.ControlDefinitions["VaultCheckinTop"].Execute();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erro ao executar o comando: " + ex.ToString());
-            }
-        }
-        public void ListarComandos()
-        {
-            try
-            {
+        #endregion
 
-                CommandManager commandManager = Parametros._invApp.CommandManager;
+        #region OPERAÇÕES DE TABELAS
 
-                foreach (ControlDefinition ctrlDef in commandManager.ControlDefinitions)
+        public void CriarTabelaItens(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                Produto2 prod = node.Tag as Produto2;
+                if (prod == null || !node.Text.Contains('.'))
                 {
-                    File.AppendAllText(@"C:\KeepSoftwares\Bosch\Log\arquivos.txt", $"Command Name: {ctrlDef.DisplayName}, ID: {ctrlDef.InternalName}{System.Environment.NewLine}");
+                    CriarTabelaItens(node.Nodes);
+                }
+                else
+                {
+                    AdicionarLinhaTabelaItens(prod);
+
+                    if (node.Nodes.Count > 0)
+                    {
+                        CriarTabelaItens(node.Nodes);
+                    }
                 }
             }
-            catch (Exception ex)
+        }
+        public void AdicionarLinhaTabelaItens(Produto2 prod)
+        {
+
+            int rowIndex = tabelaItens.Rows.Add(TableFormat.Linha(prod));
+        }
+        public void CriarTabelaPropriedades()
+        {
+            tabelaATMOLIB.Rows.Clear();
+
+            foreach (Produto2 prod in codNorma.Produtos)
             {
-                MessageBox.Show("Erro ao listar comandos: " + ex.Message);
-            }
-        }
-        private void tabelaItens_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
 
-            //MostrarMiniatura(e);
-        }
-        private void TabelaDesconhecidos_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            MostrarMiniatura(e);
-
-        }
-        private void tabelaATMOLIB_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            MostrarMiniatura(e);
-
-        }
-        public void MostrarMiniatura(DataGridViewCellEventArgs e)
-        {
-
-            if (e.RowIndex >= 0)
-            {
-                Produto2 prod = (Produto2)tabelaItens.Rows[e.RowIndex].Tag;
-
-                Form_Imagem form = new Form_Imagem();
-                form.imagem(prod.Thumbnail);
-                form.Show();
-            }
-        }
-        private void btnDeletar_Click(object sender, EventArgs e)
-        {
-
-            List<DataGridViewRow> listaRows = new List<DataGridViewRow>();
-
-            foreach (DataGridViewRow row in tabelaItens.Rows)
-            {
-                if (Convert.ToBoolean(row.Cells["ColunaCheck"].Value) == true && !Convert.ToBoolean(row.Cells["colunaInventor"].Value))
+                if (prod.Categoria == ProductType.LIBRARY && !prod.isMissing)
                 {
-                    Produto2 prod = (Produto2)row.Tag;
+                    if (prod.propriedades == null)
+                    {
+                        try
+                        {
+                            Document doc = Parametros._invApp.Documents.Open(prod.NewFileName, false);
+                            prod.propriedades = new Propriedades(doc);
+                            doc.Save();
+                            doc.Close();
+                        }
+                        catch (Exception e1)
+                        {
 
-                    TreeBosch.Nodes.Remove(prod.node);
-                    Parametros.DicionarioNodes.Remove(Path.GetFileName(prod.NewFileName));
+                            Log.GravarLog($"Erro ao preencher as propriedades: {prod.NewFileName} --- {e1.ToString()}");
+                        }
+                    }
 
-                    codNorma.Produtos.Remove(prod);
-                    listaRows.Add(row);
+                    int rowIndex = tabelaATMOLIB.Rows.Add(
+                           prod.isVaultExisting,
+                           Path.GetDirectoryName(prod.NewFileName).Split('\\').Last(),
+                           Path.GetFileName(prod.NewFileName),
+                           prod.propriedades.RBGBDETAILS,
+                           prod.propriedades.RBGBPRODUCERNAME,
+                           prod.propriedades.RBGBPRODUCERORDERNO);
+
+                    tabelaATMOLIB.Rows[rowIndex].Tag = prod;
+                    tabelaATMOLIB.Rows[rowIndex].ReadOnly = prod.isVaultExisting;
+
                 }
             }
-            listaRows.ForEach(tabelaItens.Rows.Remove);
-            IsDesconhecidosEmpty();
-
         }
-        private void button1_Click_1(object sender, EventArgs e)
+        public void CriarTabelaRelatorios()
         {
+            tabelaRelatorios.Rows.Clear();
+
+            List<Produto2> produtosFaltando = codNorma.Produtos.Where(x => x.isMissing).ToList();
+            PreencherTabelaRelatorio(produtosFaltando, "ARQUIVOS FALTANDO");
+            List<Produto2> produtosDesconhecidos = codNorma.Produtos.Where(x => x.Categoria == ProductType.DESCONHECIDO).ToList();
+            PreencherTabelaRelatorio(produtosDesconhecidos, "ARQUIVOS NÃO CLASSIFICADOS");
 
         }
-        private void button2_Click(object sender, EventArgs e)
+        public void PreencherTabelaRelatorio(List<Produto2> prods, string Erro)
         {
+            foreach (Produto2 prod in prods)
+            {
+
+                int rowIndex = tabelaRelatorios.Rows.Add(
+                       Erro,
+                       prod.NewFileName,
+                       prod.InternalFileName);
+
+                tabelaRelatorios.Rows[rowIndex].Tag = prod;
+                //tabelaATMOLIB.Rows[rowIndex].ReadOnly = prod.isVaultExisting;
+
+            }
+        }
+        private void BtnCheckIn_Click(object sender, EventArgs e)
+        {
+            CloseAllDocuments();
+
+            CopiarArquivosLibraryParaVaultWorkfolder();
 
         }
 
+        public void CloseAllDocuments()
+        {
+            foreach (Document doc in Parametros._invApp.Documents)
+            {
+                try
+                {
+                    doc.Save2();
+                    doc.Close();
+                }
+                catch (Exception e1)
+                {
+
+                    Log.GravarLog(e1.Message, LogName.ProductLog);
+                }
+
+            }
+
+            if (Parametros._invApp.Documents.Count > 0)
+                CloseAllDocuments();
+
+        }
+
+        public void CopiarArquivosLibraryParaVaultWorkfolder()
+        {
+            List<Produto2> produtosNormaParaCadastrar = codNorma.Produtos
+                .Where(x => x.Categoria == ProductType.LIBRARY && x.isVaultExisting == false)
+                .ToList();
+
+            foreach (Produto2 prod in produtosNormaParaCadastrar)
+            {
+
+                prod.OldFileName = prod.NewFileName;
+                prod.FileNameSimplificado = prod.FileNameSimplificado.Replace('/', '\\');
+                prod.NewFileName = Path.Combine(Parametros.VaultWorkFolder, prod.FileNameSimplificado.Substring(2));
+                try
+                {
+                    if (!Directory.Exists(Path.GetDirectoryName(prod.NewFileName)))
+                        Directory.CreateDirectory(Path.GetDirectoryName(prod.NewFileName));
+
+                    if (!File.Exists(prod.NewFileName))
+                        File.Copy(prod.OldFileName, prod.NewFileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+
+            }
+
+            OpenAssemblies(produtosNormaParaCadastrar);
+        }
+
+        public void OpenAssemblies(List<Produto2> produtosNormaParaCadastrar)
+        {
+            List<Produto2> NormasParaCadastrarAssemblies = produtosNormaParaCadastrar.Where(x => x.NewFileName.EndsWith(".iam")).ToList();
+
+            try
+            {
+                if (Parametros._invApp.Documents.Count > 0)
+                    Parametros._invApp = (Inventor.Application)Activator.CreateInstance(Type.GetTypeFromProgID("Inventor.Application"));
+            }
+            catch (Exception)
+            {
+                //Parametros._invApp = (Inventor.Application)Activator.CreateInstance(Categoria.GetTypeFromProgID("Inventor.Application"));
+                Log.GravarLog("Erro ao pegar a instancia do Inventor");
+            }
+
+            if (Parametros._invApp.Documents.Count != 0) return;
+
+
+            Parametros._invApp.Visible = true;
+            Parametros._invApp.SilentOperation = true;
+            Parametros._invApp.DesignProjectManager.DesignProjects.AddExisting(Parametros.ProjectEDIT_ATMOLIB).Activate();
+
+            List<string> arquivosToOpen = produtosNormaParaCadastrar.Select(x => x.NewFileName).ToList();
+
+            foreach (Produto2 norma in NormasParaCadastrarAssemblies)
+            {
+                AssemblyDocument documentNorma = Parametros._invApp.Documents.Open(norma.NewFileName, true) as AssemblyDocument;
+                if (arquivosToOpen.Contains(norma.NewFileName))
+                    arquivosToOpen.Remove(norma.NewFileName);
+
+
+
+
+
+                foreach (Document docDesc in documentNorma.AllReferencedDocuments)
+                {
+
+
+
+                    //if (docDesc is DocumentDescriptor)
+                    {
+                        // DocumentDescriptor OdocDesc = (DocumentDescriptor)docDesc;
+                        if (arquivosToOpen.Contains(docDesc.FullDocumentName))
+                            arquivosToOpen.Remove(docDesc.FullDocumentName);
+
+                    }
+
+
+                }
+            }
+
+            foreach (string arquivosRestantes in arquivosToOpen)
+            {
+                Document documentNorma = Parametros._invApp.Documents.Open(arquivosRestantes, true) as Document;
+
+            }
+
+
+        }
+
+
+
+
+        //private void CriarTabelaDesconhecida()
+        //{
+        //    if (codNorma.Produtos.Any(x => x.Categoria == ProductType.DESCONHECIDO))
+        //    {
+        //        BtnCheckIn.Enabled = false;
+        //        if (!tabControl1.TabPages.Contains(tabDesconhecidos))
+        //            tabControl1.TabPages.Add(tabDesconhecidos);
+
+        //        foreach (Produto2 prod in codNorma.Produtos)
+        //        {
+        //            if (prod.Categoria == ProductType.DESCONHECIDO)
+        //            {
+        //                AdicionarLinhaTabelaDesconhecidos(prod);
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (tabControl1.TabPages.Contains(tabDesconhecidos))
+        //            tabControl1.TabPages.Remove(tabDesconhecidos);
+        //    }
+        //}
+
+        //private void AdicionarLinhaTabelaDesconhecidos(Produto2 prod)
+        //{
+
+        //    int rowIndex = TabelaDesconhecidos.Rows.Add(
+        //            false,
+        //            prod.isAssemblyParticipant,
+        //            $"{Path.GetFileName(prod.Filename)}",
+        //            prod.InternalZipFileName);
+
+        //    TabelaDesconhecidos.Rows[rowIndex].Tag = prod;
+        //}
+
+        #endregion
+
+        private void btnAtt_Click(object sender, EventArgs e)
+        {
+            foreach (Produto2 prod in codNorma.Produtos)
+            {
+                if (!prod.isVaultExisting)
+                {
+                    Autodesk.Connectivity.WebServices.File[] files = VaultHelper.FindFileByName(Path.GetFileName(prod.NewFileName));
+                    if (files == null)
+                        prod.isVaultExisting = false;
+                    else
+                        prod.isVaultExisting = true;
+                }
+
+            }
+
+            CriarTabelaItens(TreeBosch.TopNode.Nodes);
+
+            if (codNorma.Produtos.Any(x => x.isMissing)) return;
+            if (codNorma.Produtos.Any(x => x.Categoria == ProductType.DESCONHECIDO)) return;
+
+            //if (codNorma.Produtos.Any(x => x.isVaultExisting == false && x.Categoria == ProductType.LIBRARY))
+            //    BtnCheckInAtmo.Enabled = true;
+            //else
+            //    BtnCheckInAtmo.Enabled = false;
+
+
+            List<Produto2> AtmoLibList = codNorma.Produtos.Where(x => x.Categoria == ProductType.LIBRARY).ToList();
+
+            if (AtmoLibList.Any(x => x.isVaultExisting == false))
+            {
+                btnCheckInNorma.Enabled = false;
+                BtnCheckInAtmo.Enabled = true;
+            }
+            else
+            {
+                btnCheckInNorma.Enabled = true;
+                BtnCheckInAtmo.Enabled = false;
+
+            }
+
+
+            this.Cursor = Cursors.Default;
+            return;
+
+
+            // IsProjectFixed();
+
+
+
+
+        }
+
+        private void btnCheckInNorma_Click(object sender, EventArgs e)
+        {
+            CloseAllDocuments();
+            MoverArquivosToVault();
+        }
     }
     public static class TableFormat
     {
-
         public static ImageList IconesComandos;
         public static ImageList IconesInventor;
         public static DataGridView Tabela;
@@ -1303,8 +1707,6 @@ namespace Bosch_ImportData
                 default: return Resources.Outros;
             }
         }
-
-
         public static string GetDisplayName(Produto2 prod)
         {
             if (prod.Categoria == ProductType.DESCONHECIDO)
@@ -1341,7 +1743,6 @@ namespace Bosch_ImportData
             }
             return Color.Black;
         }
-
         public static DataGridViewRow Linha(Produto2 prod)
         {
             DataGridViewRow linhaRow = new DataGridViewRow();
@@ -1374,8 +1775,8 @@ namespace Bosch_ImportData
     }
 
 
-}
 
+}
 
 
 

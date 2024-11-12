@@ -103,8 +103,6 @@ C:\KeepSoftwares\Bosch\Bosch_ImportData.exe.config
 C:\KeepSoftwares\Bosch\Bosch_ImportData.exe
 C:\KeepCAD\ImportacaoArquivos\StandardIPJ.ipj
 C:\KeepCAD\ImportacaoArquivos\Json\Data.json
-C:\KeepCAD\ImportacaoArquivos\Bosch_ImportData.exe.config
-C:\KeepCAD\ImportacaoArquivos\Bosch_ImportData.exe
 C:\KeepCAD\ImportacaoArquivos\Bosch_ImportData.pdb
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.csproj.AssemblyReference.cache
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.Form_Imagem.resources
@@ -113,8 +111,11 @@ C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.Properties
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.csproj.GenerateResource.cache
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.csproj.CoreCompileInputs.cache
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_Im.1466DB78.Up2Date
-C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.exe
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.pdb
 C:\KeepCAD\ImportacaoArquivos\Json\ProductInformation.json
 C:\KeepCAD\ImportacaoArquivos\Properties\Resources.resx
 C:\KeepCAD\ImportacaoArquivos\Properties\Resources.Designer.cs
+C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.SplashScreen.resources
+C:\KeepCAD\ImportacaoArquivos\Bosch_ImportData.exe.config
+C:\KeepCAD\ImportacaoArquivos\Bosch_ImportData.exe
+C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.exe

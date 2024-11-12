@@ -2,15 +2,26 @@
 using System.IO;
 namespace Bosch_ImportData
 {
+    public enum LogName
+    {
+        AppLog,
+        ProductLog,
+        ArquivosFaltantes
+    };
+
     public static class Log
     {
-        static string logPath { get; set; } = @"C:\KeepCAD\ImportacaoArquivos\Log\AppLog.txt";
-        public static void gravarLog(string msg)
-        {
-            if (!Directory.Exists(Path.GetDirectoryName(logPath)))
-                Directory.CreateDirectory(Path.GetDirectoryName(logPath));
+        static string logPath { get; set; } = @"C:\KeepCAD\ImportacaoArquivos\Log\";
+     
 
-            File.AppendAllText(logPath, $"{DateTime.Now}: {msg} {System.Environment.NewLine}");
+        public static void GravarLog(string msg, LogName logName = LogName.AppLog)
+        {
+            string logFileName = Path.Combine(logPath, $"{logName}.txt");
+
+            if (!Directory.Exists(Path.GetDirectoryName(logFileName)))
+                Directory.CreateDirectory(Path.GetDirectoryName(logFileName));
+
+            File.AppendAllText(logFileName, $"{DateTime.Now}: {msg}{Environment.NewLine}");
         }
     }
 }

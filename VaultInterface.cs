@@ -64,7 +64,7 @@ namespace Bosch_ImportData
             }
             catch (Exception e1)
             {
-                Log.gravarLog(e1.ToString());
+                Log.GravarLog(e1.ToString());
                 MessageBox.Show("Erro ao conectar ao VAULT \nErro: " + e1.Message);
                 return false;
             }
@@ -92,7 +92,7 @@ namespace Bosch_ImportData
             }
             catch (Exception e1)
             {
-                Log.gravarLog(e1.ToString());
+                Log.GravarLog(e1.ToString());
                 MessageBox.Show("Erro ao conectar ao VAULT \nErro: " + e1.Message);
                 return false;
             }
@@ -206,7 +206,7 @@ namespace Bosch_ImportData
 
             foreach (Folder subpasta in subpastas)
             {
-                Log.gravarLog($"{subpasta.Id} - {subpasta.Name}");
+                Log.GravarLog($"{subpasta.Id} - {subpasta.Name}");
                 listaSubPastas.Add(subpasta.Name);
             }
             return listaSubPastas;
@@ -223,7 +223,7 @@ namespace Bosch_ImportData
 
                 foreach (Folder subpasta in subpastas)
                 {
-                    Log.gravarLog($"{subpasta.Id} - {subpasta.Name}");
+                    Log.GravarLog($"{subpasta.Id} - {subpasta.Name}");
                     ChildrenFolders.Add(subpasta.Name);
                 }
                 return ChildrenFolders;
@@ -246,7 +246,7 @@ namespace Bosch_ImportData
 
                 foreach (Folder folder in VaultFolders)
                 {
-                    Log.gravarLog(folder.Name + ";" + folder.FullName + ";" + folder.Id);
+                    Log.GravarLog(folder.Name + ";" + folder.FullName + ";" + folder.Id);
                 }
 
             }
@@ -276,7 +276,7 @@ namespace Bosch_ImportData
             }
             catch (Exception e1)
             {
-                Log.gravarLog("Erro no arquivo: " + file.Name + "\n" + e1.ToString());
+                Log.GravarLog("Erro no arquivo: " + file.Name + "\n" + e1.ToString());
                 MessageBox.Show("Erro no arquivo: " + file.Name + "\n" + e1.ToString());
                 return null;
             }

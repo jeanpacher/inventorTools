@@ -16,7 +16,7 @@ namespace Bosch_ImportData
         {
             if (activeDoc == null)
             {
-                Log.gravarLog("Documento nulo. Erro ao gerar Thumbnail");
+                Log.GravarLog("Documento nulo. Erro ao gerar Thumbnail");
                 return null;
             }
 
@@ -51,7 +51,7 @@ namespace Bosch_ImportData
             }
             catch (Exception ex)
             {
-               Log.gravarLog("Erro ao criar o thumbnail: " + ex.Message);
+               Log.GravarLog("Erro ao criar o thumbnail: " + ex.Message);
                 return null;
             }
 

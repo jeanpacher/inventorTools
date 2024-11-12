@@ -38,12 +38,12 @@ namespace Bosch_ImportData.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Sites\\CtP_TEF\\project\\")]
-        public string ProjectRootPath {
+        public string Project {
             get {
-                return ((string)(this["ProjectRootPath"]));
+                return ((string)(this["Project"]));
             }
             set {
-                this["ProjectRootPath"] = value;
+                this["Project"] = value;
             }
         }
         
