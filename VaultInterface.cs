@@ -336,7 +336,6 @@ namespace Bosch_ImportData
                 return ListaPastas;
             }
         }
-
         public static void ListarPropDefIds()
         {
             try
@@ -361,6 +360,13 @@ namespace Bosch_ImportData
             }
         }
 
+        public static string GetLifecycleState(Autodesk.Connectivity.WebServices.File file)
+        {
+            return file.FileLfCyc.LfCycStateName;
+        }
 
     }
 }
+
+
+

@@ -46,6 +46,7 @@ namespace Bosch_ImportData
 
                     Produto2 prod = norma.GetNewProduct(entry.Key, false);
 
+
                     // Criar diretório pai, se não existir
                     string parentDirectory = Path.GetDirectoryName(prod.NewFileName);
                     if (!Directory.Exists(parentDirectory) && !string.IsNullOrEmpty(parentDirectory))
@@ -57,6 +58,23 @@ namespace Bosch_ImportData
                     {
                         Overwrite = true,
                     });       
+
+                    if (Path.GetFileNameWithoutExtension(prod.NewFileName).Split('\\').Last() == norma.CodigoNorma)
+                    {
+                        string extension = Path.GetExtension(prod.NewFileName);
+                        switch (extension)
+                        {
+                            case ".iam":
+                                Parametros.NormaAssembly = prod;
+                                break;
+
+                            case ".idw":
+                            case ".dwg":
+                                Parametros.NormaDrawing = prod; 
+                                break;
+
+                        }    
+                    }
                 }
             }
            // splash.Close();

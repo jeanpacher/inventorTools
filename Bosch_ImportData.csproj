@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{627F6760-741D-4594-8378-DB2A59F83514}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>Bosch_ImportData</RootNamespace>
     <AssemblyName>Bosch_ImportData</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -146,6 +146,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckInManager.cs" />
+    <Compile Include="FileCategoryManager.cs" />
     <Compile Include="Form_Imagem.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -158,11 +160,14 @@
     <Compile Include="ImportFiles.Designer.cs">
       <DependentUpon>ImportFiles.cs</DependentUpon>
     </Compile>
+    <Compile Include="InventorBomHelper.cs" />
     <Compile Include="InventorThumbnail.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="PadroesBosch.cs" />
     <Compile Include="PictureConvert.cs" />
     <Compile Include="PluginServer.cs" />
+    <Compile Include="Product.cs" />
+    <Compile Include="ProductValidator.cs" />
     <Compile Include="Produto2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

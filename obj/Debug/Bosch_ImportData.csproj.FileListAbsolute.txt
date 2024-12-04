@@ -116,6 +116,6 @@ C:\KeepCAD\ImportacaoArquivos\Json\ProductInformation.json
 C:\KeepCAD\ImportacaoArquivos\Properties\Resources.resx
 C:\KeepCAD\ImportacaoArquivos\Properties\Resources.Designer.cs
 C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.SplashScreen.resources
-C:\KeepCAD\ImportacaoArquivos\Bosch_ImportData.exe.config
-C:\KeepCAD\ImportacaoArquivos\Bosch_ImportData.exe
-C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.exe
+C:\KeepCAD\ImportacaoArquivos\Bosch_ImportData.dll.config
+C:\KeepCAD\ImportacaoArquivos\Bosch_ImportData.dll
+C:\Users\Jean\source\repos\inventorTools01\obj\Debug\Bosch_ImportData.dll

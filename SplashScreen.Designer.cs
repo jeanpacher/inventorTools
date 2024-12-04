@@ -37,8 +37,7 @@
             // 
             this.lblStatus.AutoSize = true;
             this.lblStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblStatus.Location = new System.Drawing.Point(3, 22);
-            this.lblStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblStatus.Location = new System.Drawing.Point(2, 18);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(44, 16);
             this.lblStatus.TabIndex = 0;
@@ -47,27 +46,25 @@
             // progressBarStatus
             // 
             this.progressBarStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progressBarStatus.Location = new System.Drawing.Point(0, 75);
-            this.progressBarStatus.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.progressBarStatus.Location = new System.Drawing.Point(0, 61);
             this.progressBarStatus.MarqueeAnimationSpeed = 5;
             this.progressBarStatus.Name = "progressBarStatus";
-            this.progressBarStatus.Size = new System.Drawing.Size(1480, 55);
+            this.progressBarStatus.Size = new System.Drawing.Size(1110, 45);
             this.progressBarStatus.Step = 100;
             this.progressBarStatus.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBarStatus.TabIndex = 1;
             // 
             // SplashScreen
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1480, 130);
+            this.ClientSize = new System.Drawing.Size(1110, 106);
             this.Controls.Add(this.progressBarStatus);
             this.Controls.Add(this.lblStatus);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "SplashScreen";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "STATUS DO PROCESSAMENTO";
             this.TopMost = true;
             this.TransparencyKey = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));

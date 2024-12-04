@@ -41,9 +41,10 @@
             this.btnExtrair = new System.Windows.Forms.Button();
             this.TreeBosch = new System.Windows.Forms.TreeView();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.btnCheckInNorma = new System.Windows.Forms.Button();
+            this.btnReleaseFiles = new System.Windows.Forms.Button();
             this.BtnCheckInAtmo = new System.Windows.Forms.Button();
-            this.btnAtt = new System.Windows.Forms.Button();
+            this.btnUpdate = new System.Windows.Forms.Button();
+            this.btnCheckInNorma = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabTabela = new System.Windows.Forms.TabPage();
@@ -74,6 +75,7 @@
             this.tabATMOLIB = new System.Windows.Forms.TabPage();
             this.tabelaATMOLIB = new System.Windows.Forms.DataGridView();
             this.ColunaIsVault = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.ColunaLifeCycleState = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colunaFolder = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colunaArquivo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colunaRBGBDETAILS = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -156,7 +158,7 @@
             this.txtZipFileName.Location = new System.Drawing.Point(123, 13);
             this.txtZipFileName.Name = "txtZipFileName";
             this.txtZipFileName.ReadOnly = true;
-            this.txtZipFileName.Size = new System.Drawing.Size(854, 24);
+            this.txtZipFileName.Size = new System.Drawing.Size(756, 21);
             this.txtZipFileName.TabIndex = 4;
             this.txtZipFileName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -165,9 +167,9 @@
             this.btnSearchZip.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSearchZip.Location = new System.Drawing.Point(983, 13);
+            this.btnSearchZip.Location = new System.Drawing.Point(885, 13);
             this.btnSearchZip.Name = "btnSearchZip";
-            this.btnSearchZip.Size = new System.Drawing.Size(48, 24);
+            this.btnSearchZip.Size = new System.Drawing.Size(24, 24);
             this.btnSearchZip.TabIndex = 3;
             this.btnSearchZip.Text = "...";
             this.btnSearchZip.UseVisualStyleBackColor = true;
@@ -177,13 +179,14 @@
             // 
             this.btnExtrair.AutoSize = true;
             this.btnExtrair.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnExtrair.Location = new System.Drawing.Point(1037, 13);
+            this.btnExtrair.Enabled = false;
+            this.btnExtrair.Location = new System.Drawing.Point(915, 13);
             this.btnExtrair.MinimumSize = new System.Drawing.Size(70, 0);
             this.btnExtrair.Name = "btnExtrair";
-            this.btnExtrair.Size = new System.Drawing.Size(93, 24);
+            this.btnExtrair.Size = new System.Drawing.Size(79, 24);
             this.btnExtrair.TabIndex = 7;
             this.btnExtrair.Text = "ABRIR";
-            this.toolTip1.SetToolTip(this.btnExtrair, "LEGAL. VAMOS LA");
+            this.toolTip1.SetToolTip(this.btnExtrair, "Clique para abrir os arquivos");
             this.btnExtrair.UseVisualStyleBackColor = true;
             this.btnExtrair.Click += new System.EventHandler(this.btnExtrair_Click);
             // 
@@ -209,21 +212,23 @@
             // 
             this.tableLayoutPanel1.AutoSize = true;
             this.tableLayoutPanel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.tableLayoutPanel1.ColumnCount = 7;
+            this.tableLayoutPanel1.ColumnCount = 8;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 54F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 99F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 128F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 123F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
-            this.tableLayoutPanel1.Controls.Add(this.txtZipFileName, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.btnSearchZip, 1, 0);
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 85F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 127F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 136F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 72F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 112F));
+            this.tableLayoutPanel1.Controls.Add(this.btnReleaseFiles, 7, 0);
             this.tableLayoutPanel1.Controls.Add(this.btnExtrair, 3, 0);
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.btnCheckInNorma, 5, 0);
             this.tableLayoutPanel1.Controls.Add(this.BtnCheckInAtmo, 4, 0);
-            this.tableLayoutPanel1.Controls.Add(this.btnAtt, 6, 0);
+            this.tableLayoutPanel1.Controls.Add(this.btnUpdate, 6, 0);
+            this.tableLayoutPanel1.Controls.Add(this.btnCheckInNorma, 5, 0);
+            this.tableLayoutPanel1.Controls.Add(this.btnSearchZip, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.txtZipFileName, 1, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.tableLayoutPanel1.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
@@ -235,16 +240,16 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1454, 40);
             this.tableLayoutPanel1.TabIndex = 17;
             // 
-            // btnCheckInNorma
+            // btnReleaseFiles
             // 
-            this.btnCheckInNorma.Enabled = false;
-            this.btnCheckInNorma.Location = new System.Drawing.Point(1264, 13);
-            this.btnCheckInNorma.Name = "btnCheckInNorma";
-            this.btnCheckInNorma.Size = new System.Drawing.Size(117, 23);
-            this.btnCheckInNorma.TabIndex = 9;
-            this.btnCheckInNorma.Text = "NORMA CHECK IN";
-            this.btnCheckInNorma.UseVisualStyleBackColor = true;
-            this.btnCheckInNorma.Click += new System.EventHandler(this.btnCheckInNorma_Click);
+            this.btnReleaseFiles.Enabled = false;
+            this.btnReleaseFiles.Location = new System.Drawing.Point(1335, 13);
+            this.btnReleaseFiles.Name = "btnReleaseFiles";
+            this.btnReleaseFiles.Size = new System.Drawing.Size(104, 23);
+            this.btnReleaseFiles.TabIndex = 11;
+            this.btnReleaseFiles.Text = "RELEASE FILES";
+            this.btnReleaseFiles.UseVisualStyleBackColor = true;
+            this.btnReleaseFiles.Click += new System.EventHandler(this.btnReleaseFiles_Click);
             // 
             // BtnCheckInAtmo
             // 
@@ -252,26 +257,38 @@
             this.BtnCheckInAtmo.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.BtnCheckInAtmo.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.BtnCheckInAtmo.Enabled = false;
-            this.BtnCheckInAtmo.Location = new System.Drawing.Point(1136, 13);
+            this.BtnCheckInAtmo.Location = new System.Drawing.Point(1000, 14);
             this.BtnCheckInAtmo.MaximumSize = new System.Drawing.Size(120, 0);
             this.BtnCheckInAtmo.MinimumSize = new System.Drawing.Size(120, 0);
             this.BtnCheckInAtmo.Name = "BtnCheckInAtmo";
-            this.BtnCheckInAtmo.Size = new System.Drawing.Size(120, 24);
+            this.BtnCheckInAtmo.Size = new System.Drawing.Size(120, 23);
             this.BtnCheckInAtmo.TabIndex = 8;
             this.BtnCheckInAtmo.Text = "ATMOLIB CHECK IN";
             this.toolTip1.SetToolTip(this.BtnCheckInAtmo, "CLIQUE PARA FAZER O CHECJIN");
             this.BtnCheckInAtmo.UseVisualStyleBackColor = true;
             this.BtnCheckInAtmo.Click += new System.EventHandler(this.BtnCheckIn_Click);
             // 
-            // btnAtt
+            // btnUpdate
             // 
-            this.btnAtt.Location = new System.Drawing.Point(1387, 13);
-            this.btnAtt.Name = "btnAtt";
-            this.btnAtt.Size = new System.Drawing.Size(54, 23);
-            this.btnAtt.TabIndex = 10;
-            this.btnAtt.Text = "Update";
-            this.btnAtt.UseVisualStyleBackColor = true;
-            this.btnAtt.Click += new System.EventHandler(this.btnAtt_Click);
+            this.btnUpdate.Enabled = false;
+            this.btnUpdate.Location = new System.Drawing.Point(1263, 13);
+            this.btnUpdate.Name = "btnUpdate";
+            this.btnUpdate.Size = new System.Drawing.Size(66, 23);
+            this.btnUpdate.TabIndex = 10;
+            this.btnUpdate.Text = "UPDATE";
+            this.btnUpdate.UseVisualStyleBackColor = true;
+            this.btnUpdate.Click += new System.EventHandler(this.btnAtt_Click);
+            // 
+            // btnCheckInNorma
+            // 
+            this.btnCheckInNorma.Enabled = false;
+            this.btnCheckInNorma.Location = new System.Drawing.Point(1127, 13);
+            this.btnCheckInNorma.Name = "btnCheckInNorma";
+            this.btnCheckInNorma.Size = new System.Drawing.Size(127, 23);
+            this.btnCheckInNorma.TabIndex = 9;
+            this.btnCheckInNorma.Text = "NORMA CHECK IN";
+            this.btnCheckInNorma.UseVisualStyleBackColor = true;
+            this.btnCheckInNorma.Click += new System.EventHandler(this.btnCheckInNorma_Click);
             // 
             // splitContainer1
             // 
@@ -419,7 +436,7 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(307, 26);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(44, 15);
+            this.label3.Size = new System.Drawing.Size(42, 13);
             this.label3.TabIndex = 33;
             this.label3.Text = "PASTA";
             // 
@@ -437,7 +454,7 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(8, 26);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(74, 15);
+            this.label2.Size = new System.Drawing.Size(69, 13);
             this.label2.TabIndex = 31;
             this.label2.Text = "CATEGORIA";
             // 
@@ -581,7 +598,7 @@
             // 
             this.ColunaRenomear.Description = "Renomear Arquivo";
             this.ColunaRenomear.HeaderText = "RENAME";
-            this.ColunaRenomear.Image = global::Bosch_ImportData.Properties.Resources.ColunaRenomear;
+            this.ColunaRenomear.Image = ((System.Drawing.Image)(resources.GetObject("ColunaRenomear.Image")));
             this.ColunaRenomear.MinimumWidth = 6;
             this.ColunaRenomear.Name = "ColunaRenomear";
             this.ColunaRenomear.Resizable = System.Windows.Forms.DataGridViewTriState.True;
@@ -591,7 +608,7 @@
             // ColunaProcurar
             // 
             this.ColunaProcurar.HeaderText = "SEARCH";
-            this.ColunaProcurar.Image = global::Bosch_ImportData.Properties.Resources.ColunaProcurar;
+            this.ColunaProcurar.Image = ((System.Drawing.Image)(resources.GetObject("ColunaProcurar.Image")));
             this.ColunaProcurar.MinimumWidth = 6;
             this.ColunaProcurar.Name = "ColunaProcurar";
             this.ColunaProcurar.ToolTipText = "Substituir por um arquivo local";
@@ -600,7 +617,7 @@
             // ColunaDeletar
             // 
             this.ColunaDeletar.HeaderText = "REMOVE";
-            this.ColunaDeletar.Image = global::Bosch_ImportData.Properties.Resources.ColunaDeletar;
+            this.ColunaDeletar.Image = ((System.Drawing.Image)(resources.GetObject("ColunaDeletar.Image")));
             this.ColunaDeletar.MinimumWidth = 6;
             this.ColunaDeletar.Name = "ColunaDeletar";
             this.ColunaDeletar.ToolTipText = "Deletar Arquivo";
@@ -610,7 +627,7 @@
             // ColunaMover
             // 
             this.ColunaMover.HeaderText = "MOVE";
-            this.ColunaMover.Image = global::Bosch_ImportData.Properties.Resources.ColunaMover;
+            this.ColunaMover.Image = ((System.Drawing.Image)(resources.GetObject("ColunaMover.Image")));
             this.ColunaMover.MinimumWidth = 6;
             this.ColunaMover.Name = "ColunaMover";
             this.ColunaMover.ToolTipText = "Mover Arquivo";
@@ -620,7 +637,7 @@
             // ColunaPreview
             // 
             this.ColunaPreview.HeaderText = "PREVIEW";
-            this.ColunaPreview.Image = global::Bosch_ImportData.Properties.Resources.ColunaPreview;
+            this.ColunaPreview.Image = ((System.Drawing.Image)(resources.GetObject("ColunaPreview.Image")));
             this.ColunaPreview.MinimumWidth = 6;
             this.ColunaPreview.Name = "ColunaPreview";
             this.ColunaPreview.Width = 60;
@@ -644,6 +661,7 @@
             this.tabelaATMOLIB.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.tabelaATMOLIB.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ColunaIsVault,
+            this.ColunaLifeCycleState,
             this.colunaFolder,
             this.colunaArquivo,
             this.colunaRBGBDETAILS,
@@ -666,6 +684,13 @@
             this.ColunaIsVault.Name = "ColunaIsVault";
             this.ColunaIsVault.ReadOnly = true;
             this.ColunaIsVault.Width = 60;
+            // 
+            // ColunaLifeCycleState
+            // 
+            this.ColunaLifeCycleState.HeaderText = "LIFECLYCLE STATE";
+            this.ColunaLifeCycleState.Name = "ColunaLifeCycleState";
+            this.ColunaLifeCycleState.ReadOnly = true;
+            this.ColunaLifeCycleState.Width = 150;
             // 
             // colunaFolder
             // 
@@ -725,7 +750,7 @@
             this.checkBox4.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkBox4.Location = new System.Drawing.Point(609, 14);
             this.checkBox4.Name = "checkBox4";
-            this.checkBox4.Size = new System.Drawing.Size(221, 23);
+            this.checkBox4.Size = new System.Drawing.Size(175, 20);
             this.checkBox4.TabIndex = 4;
             this.checkBox4.Text = "Libraries não cadastradas";
             this.checkBox4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -738,7 +763,7 @@
             this.checkBox3.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkBox3.Location = new System.Drawing.Point(385, 14);
             this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(261, 23);
+            this.checkBox3.Size = new System.Drawing.Size(208, 20);
             this.checkBox3.TabIndex = 3;
             this.checkBox3.Text = "Arquivos com nomes incorretos";
             this.checkBox3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -751,7 +776,7 @@
             this.checkBox2.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkBox2.Location = new System.Drawing.Point(184, 14);
             this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(225, 23);
+            this.checkBox2.Size = new System.Drawing.Size(179, 20);
             this.checkBox2.TabIndex = 2;
             this.checkBox2.Text = "Arquivos não classificados";
             this.checkBox2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -764,7 +789,7 @@
             this.checkBox1.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkBox1.Location = new System.Drawing.Point(3, 14);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(221, 23);
+            this.checkBox1.Size = new System.Drawing.Size(175, 20);
             this.checkBox1.TabIndex = 2;
             this.checkBox1.Text = "Arquivos não encontrados";
             this.checkBox1.UseVisualStyleBackColor = true;
@@ -907,12 +932,6 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn ColunaIsVault;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colunaFolder;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colunaArquivo;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colunaRBGBDETAILS;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColunaRBGBPRODUCERNAME;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColunaRBGBPRODUCERORDERNO;
         private System.Windows.Forms.TabPage tabConferencia;
         private System.Windows.Forms.TextBox txtConferencia;
         private System.Windows.Forms.DataGridView tabelaRelatorios;
@@ -923,7 +942,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colunaErro;
         private System.Windows.Forms.DataGridViewTextBoxColumn colNomeArquivo;
         private System.Windows.Forms.DataGridViewTextBoxColumn colNomeOriginal;
-        private System.Windows.Forms.Button btnAtt;
+        private System.Windows.Forms.Button btnUpdate;
         private System.Windows.Forms.DataGridViewCheckBoxColumn ColunaItem;
         private System.Windows.Forms.DataGridViewCheckBoxColumn isVault;
         private System.Windows.Forms.DataGridViewCheckBoxColumn IsInventor;
@@ -936,5 +955,13 @@
         private System.Windows.Forms.DataGridViewImageColumn ColunaDeletar;
         private System.Windows.Forms.DataGridViewImageColumn ColunaMover;
         private System.Windows.Forms.DataGridViewImageColumn ColunaPreview;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn ColunaIsVault;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColunaLifeCycleState;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colunaFolder;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colunaArquivo;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colunaRBGBDETAILS;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColunaRBGBPRODUCERNAME;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColunaRBGBPRODUCERORDERNO;
+        private System.Windows.Forms.Button btnReleaseFiles;
     }
 }

@@ -129,7 +129,7 @@ namespace Bosch_ImportData
             Trace.TraceInformation(": BoschAutomation: deactivating... ");
 
             // Release objects.
-            invApp = null;
+            //invApp = null;
             // Marshal.ReleaseComObject(invApp);
 
 
@@ -140,7 +140,7 @@ namespace Bosch_ImportData
         void CarregarUI_ImportData(NameValueMap Content)
         {
             ImportFiles ImportData = new ImportFiles();
-            ShowFormControl.ShowModalForm(ImportData);
+            ShowFormControl.ShowModelessForm(ImportData);
         }
 
         //public void m_ApplicationEvents_OnOpenDocument(_Document DocumentObject, string FullDocumentName, EventTimingEnum BeforeOrAfter, NameValueMap Context, out HandlingCodeEnum HandlingCode)

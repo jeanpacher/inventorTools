@@ -9,6 +9,7 @@ using Config = Bosch_ImportData.Properties.Settings;
 using File = Autodesk.Connectivity.WebServices.File;
 using Folder = Autodesk.Connectivity.WebServices.Folder;
 using Path = System.IO.Path;
+using VDF = Autodesk.DataManagement.Client.Framework;
 
 //Autodesk.Connectivity.WebServices.File arquivo;
 
@@ -64,6 +65,7 @@ namespace Bosch_ImportData
         public string IconName { get; set; }
         public bool IsDeleted { get; set; } = false;
         public SourceFile sourceFile { get; set; } = SourceFile.FromClient;
+        public string LifeCycleState { get; set; } = string.Empty;
         public ProductType Categoria { get; set; }
         public FileType TipoArquivo { get; set; }
         public Document Doc { get; set; }
@@ -146,7 +148,10 @@ namespace Bosch_ImportData
             string partial_name = null;
             if (name.Contains("_"))
                 partial_name = name.Split('_').First();
-
+            else
+                partial_name = name.Split('.').First();
+           
+            
             if (parts.Length > 2)
             {
                 // -1 = ultima parte - filename
@@ -201,16 +206,54 @@ namespace Bosch_ImportData
             {
                 Categoria = ProductType.LIBRARY;
             }
+
+            else if (CheckFileVault(name))
+            {
+                DefineType();
+                return; 
+            }
             else
             {
                 Categoria = ProductType.DESCONHECIDO;
-                FileNameSimplificado = Path.Combine("DESCONHECIDO", name);
+                FileNameSimplificado = Path.Combine("$", "DESCONHECIDO", name);
                 
             }
 
             FileNameSimplificado = FileNameSimplificado.Replace("/", "\\");
             NewFileName = Path.Combine(Config.Default.tempVaultRootPath, FileNameSimplificado.Substring(2));
 
+        }
+
+        public bool CheckFileVault(string name)
+        {
+            Autodesk.Connectivity.WebServices.File[] files = VaultHelper.FindFileByName(name);
+
+            if (files == null) return false;
+
+            foreach (Autodesk.Connectivity.WebServices.File file in files)
+            {
+
+                if (file.Name.EndsWith(name.Split('.').Last()))
+                {
+                    VDF.Vault.Currency.Entities.FileIteration fileItem = new VDF.Vault.Currency.Entities.FileIteration(VaultHelper.connection, file);
+
+                    isVaultExisting = true;
+                    sourceFile = SourceFile.FromVault;
+                    isMissing = false;
+                    
+
+                    Folder folder = VaultHelper.connection.WebServiceManager.DocumentService.GetFolderById(file.FolderId);
+                    FileNameSimplificado = Path.Combine(folder.FullName, file.Name);
+                    FileNameSimplificado = FileNameSimplificado.Replace("/", "\\");
+                    NewFileName = Path.Combine(Config.Default.tempVaultRootPath, FileNameSimplificado.Substring(2));
+
+
+                
+
+                    return true;
+                }
+            }
+            return false;
         }
         public int GetFileExtension(string filename)
         {
@@ -263,11 +306,15 @@ namespace Bosch_ImportData
     }
     public class Propriedades
     {
+      
+
         public string RBGBDETAILS { get; set; }
         public string RBGBPRODUCERNAME { get; set; }
         public string RBGBPRODUCERORDERNO { get; set; }
         public Propriedades(Document document)
         {
+            
+
             PropertySet customProps = document.PropertySets["Inventor User Defined Properties"];
 
             RBGBDETAILS = CheckOrCreateProperty(customProps, "RBGBDETAILS");
@@ -320,7 +367,7 @@ namespace Bosch_ImportData
         {
             Document doc = Parametros._invApp.Documents.Open(prod.NewFileName, false);
             PropertySet customProps = doc.PropertySets["Inventor User Defined Properties"];
-
+          
             try
             {
                 customProps[NomePropriedade].Value = valorPropriedade;
@@ -352,11 +399,11 @@ namespace Bosch_ImportData
         public List<Produto2> Itens { get; set; } = new List<Produto2>();
     }
 
-    public class Item
-    {
-        public Produto TopLevelProduct { get; set; }
-        public List<Produto> Produtos { get; set; } = new List<Produto>();
-    }
+    //public class Item
+    //{
+    //    public Produto TopLevelProduct { get; set; }
+    //    public List<Produto> Produtos { get; set; } = new List<Produto>();
+    //}
 
 
     public class Produto
